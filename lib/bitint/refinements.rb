@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module BitInt
+class BitInt
   module Refinements
     # We sadly cant make these `def i` because `def i` already exists
     refine Integer do

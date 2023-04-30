@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module BitInt
+class BitInt < Numeric
 end
 
 require_relative 'bitint/version'

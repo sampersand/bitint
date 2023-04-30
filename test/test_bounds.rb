@@ -1,18 +1,17 @@
 # frozen_string_literal: true
-$: << '.' if $0 == __FILE__
 require 'test_helper'
 
 describe BitInt do
-  let(:u8) { BitInt::BitInt::U(8) }
-  let(:u16) { BitInt::BitInt::U(16) }
-  let(:u32) { BitInt::BitInt::U(32) }
-  let(:u64) { BitInt::BitInt::U(64) }
-  let(:u128) { BitInt::BitInt::U(128) }
-  let(:i8) { BitInt::BitInt::I(8) }
-  let(:i16) { BitInt::BitInt::I(16) }
-  let(:i32) { BitInt::BitInt::I(32) }
-  let(:i64) { BitInt::BitInt::I(64) }
-  let(:i128) { BitInt::BitInt::I(128) }
+  let(:u8) { BitInt::U(8) }
+  let(:u16) { BitInt::U(16) }
+  let(:u32) { BitInt::U(32) }
+  let(:u64) { BitInt::U(64) }
+  let(:u128) { BitInt::U(128) }
+  let(:i8) { BitInt::I(8) }
+  let(:i16) { BitInt::I(16) }
+  let(:i32) { BitInt::I(32) }
+  let(:i64) { BitInt::I(64) }
+  let(:i128) { BitInt::I(128) }
 
   describe 'bounds' do
     def assert_equal_and_kind(expected, actual, cls)
@@ -59,11 +58,11 @@ describe BitInt do
       assert_equal_and_bitint 0, u64::MIN
       assert_equal_and_bitint 0, u128::MIN
 
-      assert_equal_and_bitint -0x80, i8::MIN
-      assert_equal_and_bitint -0x8000, i16::MIN
-      assert_equal_and_bitint -0x80000000, i32::MIN
-      assert_equal_and_bitint -0x8000000000000000, i64::MIN
-      assert_equal_and_bitint -0x80000000000000000000000000000000, i128::MIN
+      assert_equal_and_bitint(-0x80, i8::MIN)
+      assert_equal_and_bitint(-0x8000, i16::MIN)
+      assert_equal_and_bitint(-0x80000000, i32::MIN)
+      assert_equal_and_bitint(-0x8000000000000000, i64::MIN)
+      assert_equal_and_bitint(-0x80000000000000000000000000000000, i128::MIN)
     end
 
     it 'has ZERO defined' do
@@ -109,34 +108,43 @@ describe BitInt do
     end
   end
 
-  describe 'BitInt::[]' do
+  describe '[]' do
   end
 
-  describe 'BitInt::U' do
+  describe 'U' do
   end
 
-  describe 'BitInt::I' do
+  describe 'I' do
   end
 
-  describe 'BitInt::signed?' do
-    value(u8).must_be :signed?
-    value(u128).must_be :signed?
+  describe 'signed?' do
+    it 'responds false for unsigned' do
+      value(u8).wont_be :signed?
+      value(u128).wont_be :signed?
+    end
 
-    value(i8).wont_be :signed?
-    value(u128).wont_be :signed?
+    it 'responds true for signed' do
+      value(i8).must_be :signed?
+      value(i128).must_be :signed?
+    end
   end
 
-  describe 'BitInt::unsigned?' do
-    value(u8).wont_be :signed?
-    value(i8).must_be :signed?
-    value(u128).wont_be :signed?
-    value(u128).must_be :signed?
+  describe 'unsigned?' do
+    it 'responds true for unsigned' do
+      value(u8).must_be :unsigned?
+      value(u128).must_be :unsigned?
+    end
+
+    it 'responds false for signed' do
+      value(i8).wont_be :unsigned?
+      value(i128).wont_be :unsigned?
+    end
   end
 
-  describe 'BitInt::inspect / BitInt::to_s' do
+  describe 'inspect / to_s' do
   end
 
-  describe 'BitInt::new' do
+  describe 'new' do
   end
 
   describe 'BitInt#==' do
@@ -144,19 +152,27 @@ describe BitInt do
     class DummyNotInt; end
 
     it 'converts to_i and has ints' do
-      value(u8.new(12)).must_be_equal DummyInt.new
-      value(u8.new(12)).must_not_equal DummyNotInt.new
-      value(u8.new(12)).must_equal 12
-      value(u8.new(12)).must_equal u8.new(12)
+      twelve = u8.new 12
+
+      value(twelve).must_be :==, DummyInt.new
+      value(twelve).wont_be :==, DummyNotInt.new
+      value(twelve).must_be :==, 12
+      value(twelve).wont_be :==, 13
+      value(twelve).must_be :==, twelve
+      value(twelve).wont_be :==, u8.new(13)
+      value(twelve).must_be :==, i8.new(12)
+
+      value(twelve).wont_be :==, i8.new(-12)
+      # TODO: check for wraparounds
     end
   end
 
   describe 'BitInt#integer?' do
     it 'is an integer' do
-      value(u8).must_be :integer?
-      value(i8).must_be :integer?
-      value(u128).must_be :integer?
-      value(i128).must_be :integer?
+      value(u8::ZERO).must_be :integer?
+      value(i8::ZERO).must_be :integer?
+      value(u128::ZERO).must_be :integer?
+      value(i128::ZERO).must_be :integer?
     end
   end
 
@@ -164,173 +180,156 @@ describe BitInt do
   end
 
   describe 'BitInt#to_i / to_int' do
+    it 'returns the internal integer' do
+      value(u8.new(12).to_i).must_equal 12
+      value(u8.new(123).to_i).must_equal 123
+      value(i8.new(-123).to_i).must_equal(-123)
+    end
+
+    it 'also responds to to_int' do
+      value(u8.new(12).to_int).must_equal 12
+      value(u8.new(123).to_int).must_equal 123
+      value(i8.new(-123).to_int).must_equal(-123)
+    end
   end
 
   describe 'BitInt#to_f' do
+    it 'returns the internal integer converted to a float' do
+      value(u8.new(12).to_f).must_be_within_epsilon 12.0
+      value(u8.new(123).to_f).must_be_within_epsilon 123.0
+      value(i8.new(-123).to_i).must_be_within_epsilon(-123.0)
+    end
   end
 
   describe 'BitInt#to_s' do
   end
 
+=begin
   describe 'BitInt#hex' do
+    # no need to test further since to_s does.
+    it 'returns hexadecimal integers'do
+      value(u8::MAX.hex).must_equal 'ff'
+      value(i16::MIN.hex).must_equal '8000'
+    end
   end
-end
 
+  describe 'BitInt#oct' do
+    # no need to test further since to_s does.
+    it 'returns hexadecimal integers'do
+      value(u8::MAX.oct).must_equal '377'
+      value(i16::MIN.oct).must_equal '100000'
+    end
+  end
 
-__END__
-#   describe 'the unsigned 8 bit integer constant' do
-#     subject { BitInt::U8 }
+  describe 'BitInt#bin' do
+    # no need to test further since to_s does.
+    it 'returns hexadecimal integers'do
+      value(u8::MAX.bin).must_equal '11111111'
+      value(i16::MIN.bin).must_equal '1000000000000000'
+    end
+  end
+=end
 
-#     it 'is equivalent to BitInt::BitInt::U(8)' do
-#       value(subject).must_equal BitInt::BitInt::U(8)
-#     end
+  describe '-@' do
+    it 'negates normal signed integers' do
+      value(-i16.new(12)).must_equal(-12)
+      value(-i32.new(-12)).must_equal(12)
+    end
 
-#     it 'must have MIN, MAX, and BOUNDS defined' do
-#       value(subject::BITS).must_equal_kind 8, Integer
-#       value(subject::MAX).must_equal_kind 0xFF, BitInt::BitInt
-#       value(subject::MIN).must_equal_kind 0x00, BitInt::BitInt
-#       value(subject::ZERO).must_equal_kind 0, BitInt::BitInt
-#       value(subject::ONE).must_equal_kind 1, BitInt::BitInt
-#       value(subject::BOUNDS).must_equal subject::MIN .. subject::MAX
-#     end
-#   end
+    it 'handles the bounds properly' do
+      value(-i16::MIN).must_equal i16::MIN
+      value(-i128::MIN).must_equal i128::MIN
 
-#   describe 'the U16 constant' do
-#     subject { BitInt::U16 }
+      value(-i16::MAX).must_equal i16::MIN + 1
+      value(-i128::MAX).must_equal i128::MIN + 1
+    end
 
-#     it 'is equivalent to BitInt::BitInt::U(16)' do
-#       value(subject).must_equal BitInt::BitInt::U(16)
-#     end
+    it 'negates unsigned numbers' do
+      value(-u16::MAX).must_equal 1
+      value(-u32.new(10)).must_equal 4294967286
+    end
+  end
 
-#     it 'must have MIN, MAX, and BOUNDS defined' do
-#       value(subject::BITS).must_equal_kind 16, Integer
-#       value(subject::MAX).must_equal_kind 0xFFFF, BitInt::BitInt
-#       value(subject::MIN).must_equal_kind 0x0000, BitInt::BitInt
-#       value(subject::ZERO).must_equal_kind 0, BitInt::BitInt
-#       value(subject::ONE).must_equal_kind 1, BitInt::BitInt
-#       value(subject::BOUNDS).must_equal subject::MIN .. subject::MAX
-#     end
-#   end
+  describe '~' do
+    it 'inverts integers on unsigned correctly' do
+      value(~u8.new(0b0000_1101)).must_equal 0b1111_0010
+      value(~u128::MIN).must_equal u128::MAX
+      value(~u64::MAX).must_equal u64::MIN
+    end
 
-#   describe 'the U32 constant' do
-#     subject { BitInt::U32 }
+    it 'is -x-1 for normal signed integers' do
+      value(~i8.new(-12)).must_equal 11
+      value(~i32.new(65537)).must_equal(-65538)
+    end
 
-#     it 'is equivalent to BitInt::BitInt::U(32)' do
-#       value(subject).must_equal BitInt::BitInt::U(32)
-#     end
+    it 'handles the bounds properly' do
+      value(~i8::MAX).must_equal i8::MIN
+      value(~i128::MIN).must_equal i128::MAX
+    end
+  end
 
-#     it 'must have MIN, MAX, and BOUNDS defined' do
-#       value(subject::BITS).must_equal_kind 32, Integer
-#       value(subject::MAX).must_equal_kind 0xFFFFFFFF, BitInt::BitInt
-#       value(subject::MIN).must_equal_kind 0x00000000, BitInt::BitInt
-#       value(subject::ZERO).must_equal_kind 0, BitInt::BitInt
-#       value(subject::ONE).must_equal_kind 1, BitInt::BitInt
-#       value(subject::BOUNDS).must_equal subject::MIN .. subject::MAX
-#     end
-#   end
+=begin
 
-#   describe 'the U64 constant' do
-#     subject { BitInt::U64 }
+  # Compares +self+ to +rhs+.
+  def <=>(rhs)
+    rhs.respond_to?(:to_i) ? @int <=> (_ = rhs).to_i : nil
+  end
 
-#     it 'is equivalent to BitInt::BitInt::U(64)' do
-#       value(subject).must_equal BitInt::BitInt::U(64)
-#     end
+  # Adds +self+ to +rhs+.
+  def +(rhs)
+    self.class.new(@int + rhs.to_i)
+  end
 
-#     it 'must have MIN, MAX, and BOUNDS defined' do
-#       value(subject::BITS).must_equal_kind 64, Integer
-#       value(subject::MAX).must_equal_kind 0xFFFFFFFF_FFFFFFFF, BitInt::BitInt
-#       value(subject::MIN).must_equal_kind 0x00000000_00000000, BitInt::BitInt
-#       value(subject::ZERO).must_equal_kind 0, BitInt::BitInt
-#       value(subject::ONE).must_equal_kind 1, BitInt::BitInt
-#       value(subject::BOUNDS).must_equal subject::MIN .. subject::MAX
-#     end
-#   end
+  # Subtracts +rhs+ from +self+.
+  def -(rhs)
+    self.class.new(@int - rhs.to_i)
+  end
 
+  # Multiplies +self+ by +rhs+.
+  def *(rhs)
+    self.class.new(@int * rhs.to_i)
+  end
 
-#   describe 'the U128 constant' do
-#     subject { BitInt::U128 }
+  # Divides +self+ by +rhs+.
+  def /(rhs)
+    self.class.new(@int / rhs.to_i)
+  end
 
-#     it 'is equivalent to BitInt::BitInt::U(128)' do
-#       value(subject).must_equal BitInt::BitInt::U(128)
-#     end
+  # Modulos +self+ by +rhs+.
+  def %(rhs)
+    self.class.new(@int % rhs.to_i)
+  end
 
-#     it 'must have MIN, MAX, and BOUNDS defined' do
-#       value(subject::BITS).must_equal_kind 128, Integer
-#       value(subject::MAX).must_equal_kind 0xFFFFFFFF_FFFFFFFF_FFFFFFFF_FFFFFFFF, BitInt::BitInt
-#       value(subject::MIN).must_equal_kind 0x00000000_00000000_00000000_00000000, BitInt::BitInt
-#       value(subject::ZERO).must_equal_kind 0, BitInt::BitInt
-#       value(subject::ONE).must_equal_kind 1, BitInt::BitInt
-#       value(subject::BOUNDS).must_equal subject::MIN .. subject::MAX
-#     end
-#   end
+  # Raises +self+ to the +rhs+th power.
+  def **(rhs)
+    # Note that `Numeric` only defines `.to_int` (not `.to_i`)
+    self.class.new((@int ** rhs.to_i).to_int)
+  end
 
-# =begin
-#   describe 'the U8 constant' do
-#     subject { BitInt::U8 }
+  # Shifts +self+ left by +rhs+ bits.
+  def <<(rhs)
+    self.class.new(@int << rhs.to_i)
+  end
 
-#     it 'is equivalent to BitInt::BitInt::U(8)' do
-#       value(subject).must_equal BitInt::BitInt::U(8)
-#     end
+  # Shifts +self+ right by +rhs+ bits.
+  def >>(rhs)
+    self.class.new(@int >> rhs.to_i)
+  end
 
-#     it 'must have MIN, MAX, and BOUNDS defined' do
-#       value(subject::BITS).must_equal_kind 8, Integer
-#       value(subject::MAX).must_equal_kind 0xff, BitInt::BitInt
-#       value(subject::MIN).must_equal_kind 0x00, BitInt::BitInt
-#       value(subject::ZERO).must_equal_kind 0, BitInt::BitInt
-#       value(subject::ONE).must_equal_kind 1, BitInt::BitInt
-#       value(subject::BOUNDS).must_equal subject::MIN .. subject::MAX
-#     end
-#   end
+  # Bitwise ANDs +self+ and +rhs+.
+  def &(rhs)
+    self.class.new(@int & rhs.to_i)
+  end
 
-#   describe 'the U8 constant' do
-#     subject { BitInt::U8 }
+  # Bitwise ORs +self+ and +rhs+.
+  def |(rhs)
+    self.class.new(@int | rhs.to_i)
+  end
 
-#     it 'is equivalent to BitInt::BitInt::U(8)' do
-#       value(subject).must_equal BitInt::BitInt::U(8)
-#     end
+  # Bitwise XORs +self+ and +rhs+.
+  def ^(rhs)
+    self.class.new(@int ^ rhs.to_i)
+  end
 
-#     it 'must have MIN, MAX, and BOUNDS defined' do
-#       value(subject::BITS).must_equal_kind 8, Integer
-#       value(subject::MAX).must_equal_kind 0xff, BitInt::BitInt
-#       value(subject::MIN).must_equal_kind 0x00, BitInt::BitInt
-#       value(subject::ZERO).must_equal_kind 0, BitInt::BitInt
-#       value(subject::ONE).must_equal_kind 1, BitInt::BitInt
-#       value(subject::BOUNDS).must_equal subject::MIN .. subject::MAX
-#     end
-#   end
-
-#   describe 'the U8 constant' do
-#     subject { BitInt::U8 }
-
-#     it 'is equivalent to BitInt::BitInt::U(8)' do
-#       value(subject).must_equal BitInt::BitInt::U(8)
-#     end
-
-#     it 'must have MIN, MAX, and BOUNDS defined' do
-#       value(subject::BITS).must_equal_kind 8, Integer
-#       value(subject::MAX).must_equal_kind 0xff, BitInt::BitInt
-#       value(subject::MIN).must_equal_kind 0x00, BitInt::BitInt
-#       value(subject::ZERO).must_equal_kind 0, BitInt::BitInt
-#       value(subject::ONE).must_equal_kind 1, BitInt::BitInt
-#       value(subject::BOUNDS).must_equal subject::MIN .. subject::MAX
-#     end
-#   end
-
-#   describe 'the U8 constant' do
-#     subject { BitInt::U8 }
-
-#     it 'is equivalent to BitInt::BitInt::U(8)' do
-#       value(subject).must_equal BitInt::BitInt::U(8)
-#     end
-
-#     it 'must have MIN, MAX, and BOUNDS defined' do
-#       value(subject::BITS).must_equal_kind 8, Integer
-#       value(subject::MAX).must_equal_kind 0xff, BitInt::BitInt
-#       value(subject::MIN).must_equal_kind 0x00, BitInt::BitInt
-#       value(subject::ZERO).must_equal_kind 0, BitInt::BitInt
-#       value(subject::ONE).must_equal_kind 1, BitInt::BitInt
-#       value(subject::BOUNDS).must_equal subject::MIN .. subject::MAX
-#     end
-#   end
-# =end
+=end
 end
