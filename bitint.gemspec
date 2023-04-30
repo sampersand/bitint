@@ -4,7 +4,7 @@ require_relative "lib/bitint/version"
 
 Gem::Specification.new do |spec|
   spec.name = "bitint"
-  spec.version = Bitint::VERSION
+  spec.version = BitInt::VERSION
   spec.authors = ["SamW"]
   spec.email = ["mail@sampersand.me"]
 
