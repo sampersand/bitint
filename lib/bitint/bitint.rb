@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class BitInt
+class BitInt < Numeric
   # Indicates that +BitInt::new+ was called with an integer that was too large.
   class OverflowError < RuntimeError
     attr_reader :integer, :range
@@ -30,6 +30,7 @@ class BitInt
     #   puts BitInt::I(16)::MAX #=> 32767
     def I(bits) = self[bits, signed: true]
     alias signed I
+    alias S I
 
     # Creates a new +BitInt+. Raises an ArgumentError if bits is negative.
     #
@@ -37,8 +38,16 @@ class BitInt
     #   puts BitInt[8]::MAX #=> 255
     #   puts BitInt[8, signed: false]::MAX #=> 255
     #   puts BitInt[8, signed: true]::MAX #=> 127
-    def [](bits, signed: false)
-      raise ArgumentError, "bit count must be positive" unless bits.positive?
+    def [](bits, signed: false) = create(bits: bits, signed: signed)
+
+    def create(bits: nil, bytes: nil, signed:)
+      if bits.nil? == bytes.nil?
+        raise ArgumentError, 'exactly one of `bits` or `bytes` must be supplied'
+      end
+
+      bits ||= bytes * 8
+
+      raise ArgumentError, 'bit count must be at least 1' unless bits.positive?
 
       @classes[[bits, signed].freeze] ||= Class.new(self) do |cls|
         cls.setup!(bits, signed)
@@ -76,6 +85,7 @@ class BitInt
       end
 
       const_set :BITS, @bits
+      const_set :BYTES, (@bits / 8.0).ceil
       const_set :MASK, (1 << @bits).pred
       const_set :ZERO, create[0]
       const_set :ONE, create[1]
@@ -122,11 +132,6 @@ class BitInt
 
   # Overwite rdoc-ref:Numeric#integer? as we're an integer.
   def integer? = true
-
-  # Gets the bit at index +idx+ or returns +nil+.
-  #
-  # This is equivalent to +Integer#[]+
-  def [](idx) = @int[idx]
 
   # :section: Conversions
 
@@ -237,11 +242,54 @@ class BitInt
 
   # :section:
 
+  # Returns whether +self+ is a positive integer. Zero is not positive.
   def positive? = @int.positive?
+
+  # Return whether +self+ is a negative integer. Zero is not negative.
   def negative? = @int.negative?
+
+  # Returns whether +self+ is zero.
   def zero? = @int.zero?
+
+  # Returns a falsey value if zero, otherwise returns +self+.
   def nonzero? = @int.nonzero? && self
+
+  # Checks to see if +self+ is even.
+  def even? = @int.even?
+
+  # Checks to see if +self+ is odd.
+  def odd? = @int.odd?
+
+  ##################################
+  # :section: Bit-level operations #
+  ##################################
+
+  # Gets the bit at index +idx+ or returns +nil+.
+  #
+  # This is equivalent to +Integer#[]+
+  def [](idx) = @int[idx]
+
+  def anybits?(mask) = @int.anybits?(mask)
+  def allbits?(mask) = @int.allbits?(mask)
+  def nobits?(mask) = @int.nobits?(mask)
+  def bit_length = @int.bit_length
+
+  def size = (self.class::BITS / 8.0).ceil
+
+
+  def bytes(endian = :native)
+    # pack_char = self.class.pack_Char
+    # case endian
+    # when :native then 
+  end
 end
+
+p BitInt[32].new(0xaa_bb_cc_dd).bytes
+__END__
+# p BitInt[17].new(1).size
+
+p (0xff**0xff).to_i.size
+p Integer.instance_methods(false) - BitInt.instance_methods
 
 class BitInt
   def to_s(base = nil)
@@ -272,6 +320,8 @@ class BitInt
   end
 end
 
+
+__END__
 (-128...0).each do
 
   puts BitInt::I(8).new(_1).bin
