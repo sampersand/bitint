@@ -211,25 +211,6 @@ class BitInt < Numeric
   # Modulos +self+ by +rhs+.
   def %(rhs) = self.class.new(@int % rhs.to_i)
 
-  # Raises +self+ to the +rhs+th power.
-  # Note that `Numeric` only defines `.to_int` (not `.to_i`)
-  def **(rhs) = self.class.new((@int ** rhs.to_i).to_int)
-
-  # Shifts +self+ left by +rhs+ bits.
-  def <<(rhs) = self.class.new(@int << rhs.to_i)
-
-  # Shifts +self+ right by +rhs+ bits.
-  def >>(rhs) = self.class.new(@int >> rhs.to_i)
-
-  # Bitwise ANDs +self+ and +rhs+.
-  def &(rhs) = self.class.new(@int & rhs.to_i)
-
-  # Bitwise ORs +self+ and +rhs+.
-  def |(rhs) = self.class.new(@int | rhs.to_i)
-
-  # Bitwise XORs +self+ and +rhs+.
-  def ^(rhs) = self.class.new(@int ^ rhs.to_i)
-
   # :section:
 
   # Returns whether +self+ is a positive integer. Zero is not positive.
@@ -254,6 +235,27 @@ class BitInt < Numeric
   # :section: Bit-level operations #
   ##################################
 
+  # Raises +self+ to the +rhs+th power.
+  #--
+  # Note that `Numeric` only defines `.to_int` (not `.to_i`)
+  #++
+  def **(rhs) = self.class.new((@int ** rhs.to_i).to_int)
+
+  # Shifts +self+ left by +rhs+ bits.
+  def <<(rhs) = self.class.new(@int << rhs.to_i)
+
+  # Shifts +self+ right by +rhs+ bits.
+  def >>(rhs) = self.class.new(@int >> rhs.to_i)
+
+  # Bitwise ANDs +self+ and +rhs+.
+  def &(rhs) = self.class.new(@int & rhs.to_i)
+
+  # Bitwise ORs +self+ and +rhs+.
+  def |(rhs) = self.class.new(@int | rhs.to_i)
+
+  # Bitwise XORs +self+ and +rhs+.
+  def ^(rhs) = self.class.new(@int ^ rhs.to_i)
+
   # Gets the bit at index +idx+ or returns +nil+.
   #
   # This is equivalent to +Integer#[]+
@@ -267,39 +269,34 @@ class BitInt < Numeric
   def size = (self.class::BITS / 8.0).ceil
 
 
-  PACK_FMT = {
-    [:native, 8,  false].freeze => 'C',
-    [:native, 16, false].freeze => 'S',
-    [:native, 32, false].freeze => 'L',
-    [:native, 64, false].freeze => 'Q',
-    [:native, 8,  true].freeze => 'c',
-    [:native, 16, true].freeze => 's',
-    [:native, 32, true].freeze => 'l',
-    [:native, 64, true].freeze => 'q',
+  # PACK_FMT = {
+  #   [:native, 8,  false].freeze => 'C',
+  #   [:native, 16, false].freeze => 'S',
+  #   [:native, 32, false].freeze => 'L',
+  #   [:native, 64, false].freeze => 'Q',
+  #   [:native, 8,  true].freeze => 'c',
+  #   [:native, 16, true].freeze => 's',
+  #   [:native, 32, true].freeze => 'l',
+  #   [:native, 64, true].freeze => 'q',
 
-  }.freeze
-  private_constant :PACK_FMT
+  # }.freeze
+  # private_constant :PACK_FMT
 
-  def bytes(endian = :native)
-    size = {
-      8 => 'C',
-      16 => 'S',
-      32 => 'L',
-      64 => 'Q'
-    }[self.class::BITS] or raise ArgumentError, "bytes only works for 8, 16, 32, or 64 rn." or raise ArgumentError, "endian must be :big, :little, or :native"
-    size = {8=>'C', 16=>}
-    size = case self.class::BITS
-           when 8 then 'C'
-           when 8 then 'C'
-    # sprintf "%0#{self.class::BYTES * 2}x",
-    # mask = self.class::MASK_CHAR or raise ArgumentError, "bytes only works (rn) on "
-    # pack_char = self.class.pack_Char
-    # case endian
-    # when :native then 
-  end
-end
-
-
-(-128..127).each do |n|
-  puts (BitInt::I(8).new(n)).to_s(2)
+  # def bytes(endian = :native)
+  #   size = {
+  #     8 => 'C',
+  #     16 => 'S',
+  #     32 => 'L',
+  #     64 => 'Q'
+  #   }[self.class::BITS] or raise ArgumentError, "bytes only works for 8, 16, 32, or 64 rn." or raise ArgumentError, "endian must be :big, :little, or :native"
+  #   size = {8=>'C', 16=>}
+  #   size = case self.class::BITS
+  #          when 8 then 'C'
+  #          when 8 then 'C'
+  #   # sprintf "%0#{self.class::BYTES * 2}x",
+  #   # mask = self.class::MASK_CHAR or raise ArgumentError, "bytes only works (rn) on "
+  #   # pack_char = self.class.pack_Char
+  #   # case endian
+  #   # when :native then 
+  # end
 end
