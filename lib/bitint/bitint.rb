@@ -278,7 +278,6 @@ class BitInt < Numeric
   #   [:native, 16, true].freeze => 's',
   #   [:native, 32, true].freeze => 'l',
   #   [:native, 64, true].freeze => 'q',
-
   # }.freeze
   # private_constant :PACK_FMT
 
