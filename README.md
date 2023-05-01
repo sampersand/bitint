@@ -21,7 +21,7 @@ Or install it yourself as:
 ## Usage
 
 ```ruby
-num = BitInt::U8.new(0xfe)
+num = BitInt::U8.new(0xFE)
 num += 2
 puts num #=> 1
 ```
