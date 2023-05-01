@@ -1,8 +1,6 @@
 # BitInt
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/bitint`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+This gem lets you emulate 2's complement integers in ruby.
 
 ## Installation
 
@@ -22,7 +20,11 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+```ruby
+num = BitInt::U8.new(0xfe)
+num += 2
+puts num #=> 1
+```
 
 ## Development
 
@@ -32,7 +34,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/bitint.
+Bug reports and pull requests are welcome on GitHub at https://github.com/sampersand/bitint.
 
 ## License
 

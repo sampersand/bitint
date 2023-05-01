@@ -94,6 +94,9 @@ class BitInt < Numeric
       const_set :BOUNDS, self::MIN .. self::MAX
     end
 
+    def pack_char
+
+    end
     # :startdoc:
   end
 
@@ -148,22 +151,11 @@ class BitInt < Numeric
   # If a base is given, a string padded with `0`s will be returned.
   def to_s(base = nil)
     return @int.to_s if base.nil?
-    return @int.to_s(base).rjust(self.class::BITS / Math.log2(base), '0') if self.class.unsigned?
 
-    fail "todo: signed result"
-    # length = (self.class::BITS / Math.log2(base)).ceil
-    # case base
-    # when 2  then sprintf "%0#{length}b", @int
-    # when 8  then sprintf "%0#{length}o", @int
-    # when 16 then sprintf "%0#{length}x", @int
-    # else
-    # end
-    # if @int.negative? 
-    #   (self.class::MAX.to_i + @int + 1).to_s(base)
-    # else
-    #   (self.class::MAX.to_i + @int + 1).to_s(base)[1..]
-    # end.then { _1.rjust self.class::BITS / Math.log2(base), @int.negative? ? '1' : '0' }
+    adjusted = negative? ? (-2*self.class::MIN + self).to_i : @int
+    adjusted.to_s(base).rjust(self.class::BITS / Math.log2(base), negative? ? '1' : '0')
   end
+
   alias inspect to_s
 
   # Returns a base-16 string of +self+. Equivalent to +to_s(16)+.
@@ -174,8 +166,7 @@ class BitInt < Numeric
   #   puts BitInt::U16.new(1234).hex #=> 04d2
   #   puts BitInt::U16.new(1234, upper: true).hex #=> 04D2
   def hex(upper: false)
-    fmt = "%0#{(self.class::BITS / 4)}#{upper ? 'X' : 'x'}"
-    sprintf(fmt, self)[-self.class::BITS.fdiv(4).floor ..]
+    to_s(16).tap { _1.upcase! if upper }
   end
 
   # Returns a base-8 string of +self+. Equivalent to +to_s(8)+.
@@ -183,8 +174,7 @@ class BitInt < Numeric
   # === Example
   #   puts BitInt::U16.new(1234).oct #=> 02322
   def oct
-    fmt = "%0#{(self.class::BITS / 8)}o"
-    sprintf(fmt, self)#[-self.class::BITS.fdiv(4).floor ..]
+    to_s(8)
   end
 
   # Returns a base-2 string of +self+. Equivalent to +to_s(2)+.
@@ -277,72 +267,39 @@ class BitInt < Numeric
   def size = (self.class::BITS / 8.0).ceil
 
 
+  PACK_FMT = {
+    [:native, 8,  false].freeze => 'C',
+    [:native, 16, false].freeze => 'S',
+    [:native, 32, false].freeze => 'L',
+    [:native, 64, false].freeze => 'Q',
+    [:native, 8,  true].freeze => 'c',
+    [:native, 16, true].freeze => 's',
+    [:native, 32, true].freeze => 'l',
+    [:native, 64, true].freeze => 'q',
+
+  }.freeze
+  private_constant :PACK_FMT
+
   def bytes(endian = :native)
+    size = {
+      8 => 'C',
+      16 => 'S',
+      32 => 'L',
+      64 => 'Q'
+    }[self.class::BITS] or raise ArgumentError, "bytes only works for 8, 16, 32, or 64 rn." or raise ArgumentError, "endian must be :big, :little, or :native"
+    size = {8=>'C', 16=>}
+    size = case self.class::BITS
+           when 8 then 'C'
+           when 8 then 'C'
+    # sprintf "%0#{self.class::BYTES * 2}x",
+    # mask = self.class::MASK_CHAR or raise ArgumentError, "bytes only works (rn) on "
     # pack_char = self.class.pack_Char
     # case endian
     # when :native then 
   end
 end
 
-p BitInt[32].new(0xaa_bb_cc_dd).bytes
-__END__
-# p BitInt[17].new(1).size
 
-p (0xff**0xff).to_i.size
-p Integer.instance_methods(false) - BitInt.instance_methods
-
-class BitInt
-  def to_s(base = nil)
-    return @int.to_s if base.nil?
-    return @int.to_s(base).rjust(self.class::BITS / Math.log2(base), '0') if self.class.unsigned?
-
-    unless negative?
-      return @int.to_s(base).rjust (self.class::BITS / Math.log2(base)).ceil, '0'
-    end
-
-    # ((self.class::MAX.to_i + 1 + @int) | (1 << self.class::BITS.pred)).to_s(base)
-    ((~self.class::MIN.to_i + @int) - self.class::MIN.to_i)
-      .to_s(base)
-      .rjust((self.class::BITS / Math.log2(base)).ceil, '0')
-    # (self.class::MAX.to_i + @int + 1)
-    # length = (self.class::BITS / Math.log2(base)).ceil
-    # case base
-    # when 2  then sprintf "%0#{length}b", @int
-    # when 8  then sprintf "%0#{length}o", @int
-    # when 16 then sprintf "%0#{length}x", @int
-    # else
-    # end
-    # if @int.negative? 
-    #   (self.class::MAX.to_i + @int + 1).to_s(base)
-    # else
-    #   (self.class::MAX.to_i + @int + 1).to_s(base)[1..]
-    # end.then { _1.rjust self.class::BITS / Math.log2(base), @int.negative? ? '1' : '0' }
-  end
+(-128..127).each do |n|
+  puts (BitInt::I(8).new(n)).to_s(2)
 end
-
-
-__END__
-(-128...0).each do
-
-  puts BitInt::I(8).new(_1).bin
-  puts BitInt::I(8)::MIN.bin
-  puts BitInt::I(8).new(_1-1).bin
-  # fail "#{_1}" unless ("1%07b" % _1) == BitInt::I(8).new(_1).bin
-  exit
-end
-__END__
-
-p BitInt::I(8)::MAX.to_s(2)
-p BitInt::I(8)::MAX.to_s(2)
-p BitInt::I(8)::new(-2).to_s(2)
-p BitInt::I(8)::new(-3).to_s(2)
-p BitInt::I(8)::MIN.to_s(2)
-__END__
-# puts BitInt[16, signed: true]::MIN.hex
-# puts BitInt[16, signed: true]::MAX.hex
-
-# puts BitInt[29, signed: true]::MIN.hex
-puts BitInt[8, signed: true]::MAX.oct
-puts BitInt[8, signed: true]::MIN.oct
-# puts BitInt[29, signed: true]::MAX.oct
-

@@ -1,91 +1,99 @@
 # frozen_string_literal: true
 
 class BitInt
+  # Refinements to Integer for easy "BitInt literals" (eg `12.u8`)
   module Refinements
-    # We sadly cant make these `def i` because `def i` already exists
     refine Integer do
       # Converts +self+ into an unsigned +bits+-bit integer.
       #
       # Any additional arguments are forwarded to +BitInt#new+
-      def U(bits, ...)
+      #
+      # === Examples
+      #   puts BitInt::U(16)::MAX #=> 65535
+      #   
+      def u(bits, ...)
         BitInt::U(bits, ...).new(self)
       end
 
       # Converts +self+ into a signed +bits+-bit integer.
       #
+      # If no arguments are given, this instead forwards to Numeric#i.
+      #
       # Any additional arguments are forwarded to +BitInt#new+
-      def I(bits, ...)
-        BitInt::I(bits, ...).new(self)
+      def i(bits = nil, ...)
+        return super if bits.nil?
+
+        BitInt::i(bits, ...).new(self)
       end
 
       # Converts +self+ into an unsigned 8-bit integer.
       #
       # Any additional arguments are forwarded to +BitInt#new+
       def u8(...)
-        U(U8, ...)
+        u(8, ...)
       end
 
       # Converts +self+ into an unsigned 16-bit integer.
       #
       # Any additional arguments are forwarded to +BitInt#new+
       def u16(...)
-        U(16, ...)
+        u(16, ...)
       end
 
       # Converts +self+ into an unsigned 32-bit integer.
       #
       # Any additional arguments are forwarded to +BitInt#new+
       def u32(...)
-        U(32, ...)
+        u(32, ...)
       end
 
       # Converts +self+ into an unsigned 64-bit integer.
       #
       # Any additional arguments are forwarded to +BitInt#new+
       def u64(...)
-        U(64, ...)
+        u(64, ...)
       end
 
       # Converts +self+ into an unsigned 128-bit integer.
       #
       # Any additional arguments are forwarded to +BitInt#new+
       def u128(...)
-        U(28, ...)
+        u(128, ...)
       end
 
       # Converts +self+ into a signed 8-bit integer.
       #
       # Any additional arguments are forwarded to +BitInt#new+
       def i8(...)
-        I(U8, ...)
+        i(8, ...)
       end
 
       # Converts +self+ into a signed 16-bit integer.
       #
       # Any additional arguments are forwarded to +BitInt#new+
       def i16(...)
-        I(16, ...)
+        i(16, ...)
       end
 
       # Converts +self+ into a signed 32-bit integer.
       #
       # Any additional arguments are forwarded to +BitInt#new+
       def i32(...)
-        I(32, ...)
+        i(32, ...)
       end
 
       # Converts +self+ into a signed 64-bit integer.
       #
       # Any additional arguments are forwarded to +BitInt#new+
       def i64(...)
-        I(64, ...)
+        i(64, ...)
       end
 
       # Converts +self+ into a signed 128-bit integer.
       #
       # Any additional arguments are forwarded to +BitInt#new+
       def i128(...)
-        I(28, ...)
+        i(128, ...)
       end
     end
   end
