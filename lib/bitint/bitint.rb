@@ -214,22 +214,34 @@ class BitInt
   # :section:
 
   # Returns whether +self+ is a positive integer. Zero is not positive.
-  def positive? = @int.positive?
+  def positive?
+    @int.positive?
+  end
 
   # Return whether +self+ is a negative integer. Zero is not negative.
-  def negative? = @int.negative?
+  def negative?
+    @int.negative?
+  end
 
   # Returns whether +self+ is zero.
-  def zero? = @int.zero?
+  def zero?
+    @int.zero?
+  end
 
   # Returns a falsey value if zero, otherwise returns +self+.
-  def nonzero? = @int.nonzero? && self
+  def nonzero?
+    @int.nonzero? && self
+  end
 
   # Checks to see if +self+ is even.
-  def even? = @int.even?
+  def even?
+    @int.even?
+  end
 
   # Checks to see if +self+ is odd.
-  def odd? = @int.odd?
+  def odd?
+    @int.odd?
+  end
 
   ##################################
   # :section: Bit-level operations #
@@ -268,34 +280,37 @@ class BitInt
 
   def size = (self.class::BITS / 8.0).ceil
 
+  PACK_FMT = {
+    [:native, 8,  false].freeze => 'C',
+    [:native, 16, false].freeze => 'S',
+    [:native, 32, false].freeze => 'L',
+    [:native, 64, false].freeze => 'Q',
+    [:native, 8,  true].freeze => 'c',
+    [:native, 16, true].freeze => 's',
+    [:native, 32, true].freeze => 'l',
+    [:native, 64, true].freeze => 'q',
+  }.freeze
+  private_constant :PACK_FMT
 
-  # PACK_FMT = {
-  #   [:native, 8,  false].freeze => 'C',
-  #   [:native, 16, false].freeze => 'S',
-  #   [:native, 32, false].freeze => 'L',
-  #   [:native, 64, false].freeze => 'Q',
-  #   [:native, 8,  true].freeze => 'c',
-  #   [:native, 16, true].freeze => 's',
-  #   [:native, 32, true].freeze => 'l',
-  #   [:native, 64, true].freeze => 'q',
-  # }.freeze
-  # private_constant :PACK_FMT
+  def bytes(endian = :native)
+    template = '_CS_L___Q'[self.class::BYTES]
+    if template.nil? || template == '_'
+      raise ArgumentError, 'bytes only works for sizes of 8, 16, 32, or 64.'
+    end
 
-  # def bytes(endian = :native)
-  #   size = {
-  #     8 => 'C',
-  #     16 => 'S',
-  #     32 => 'L',
-  #     64 => 'Q'
-  #   }[self.class::BITS] or raise ArgumentError, "bytes only works for 8, 16, 32, or 64 rn." or raise ArgumentError, "endian must be :big, :little, or :native"
-  #   size = {8=>'C', 16=>}
-  #   size = case self.class::BITS
-  #          when 8 then 'C'
-  #          when 8 then 'C'
-  #   # sprintf "%0#{self.class::BYTES * 2}x",
-  #   # mask = self.class::MASK_CHAR or raise ArgumentError, "bytes only works (rn) on "
-  #   # pack_char = self.class.pack_Char
-  #   # case endian
-  #   # when :native then 
-  # end
+    template.downcase! if self.class.signed?
+
+    case endian
+    when :native
+    when :little then template.concat '<'
+    when :big then template.concat '>'
+    else raise raise ArgumentError, 'endian must be :big, :little, or :native'
+    end
+
+    [to_i].pack(template).unpack('C*').map(&U8.method(:new))
+  end
+
+  def bytes_hex(...)
+    bytes(...).map(&:hex)
+  end
 end
