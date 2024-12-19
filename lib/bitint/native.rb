@@ -6,14 +6,16 @@ class BitInt
   # `BitInt`s that correspond to underlying C integer sizes.
   module Native
     # On big-endian systems, the unpack will equal `0x00AA`.
-    @little_endian = [0xAA00].pack('S').unpack('S<') == [0xAA00]
+    IS_LITTLE_ENDIAN = [0xAA00].pack('S').unpack('S<') == [0xAA00]
+    private_constant :IS_LITTLE_ENDIAN
 
     module_function
 
     # Returns either `:little` or `:big` depending on the underlying system's endianness.
     def endianness
-      @little_endian ? :little : :big
+      @IS_LITTLE_ENDIAN ? :little : :big
     end
+
     class << self
       alias endian endianness
     end

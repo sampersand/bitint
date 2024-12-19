@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class BitInt
+class BitInt < Numeric
   # The current version of BitInt.
-  VERSION = '0.5.2'
+  VERSION = '0.9.0'
 end

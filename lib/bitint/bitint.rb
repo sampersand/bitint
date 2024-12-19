@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class BitInt < Numeric
+class BitInt
   # Indicates that +BitInt::new+ was called with an integer that was too large.
   class OverflowError < RuntimeError
     attr_reader :integer, :range
