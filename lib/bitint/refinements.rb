@@ -20,10 +20,10 @@ class BitInt
       # If no arguments are given, this instead forwards to Numeric#i.
       #
       # Any additional arguments are forwarded to +BitInt#new+
-      def i(bits = bits_not_given=true, ...)
+      def i(bits = bits_not_given=true, *a, **k, &b) # Support ruby-3.0
         bits_not_given and return super
 
-        BitInt::i(bits, ...).new(self)
+        BitInt::i(bits, *a, **k, &b).new(self)
       end
 
       # Converts +self+ into an unsigned 8-bit integer.

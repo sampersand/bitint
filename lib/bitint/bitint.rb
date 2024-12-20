@@ -293,6 +293,8 @@ class BitInt
   private_constant :PACK_FMT
 
   def bytes(endian = :native)
+    return to_enum(__method__, endian) unless block_given?
+
     template = '_CS_L___Q'[self.class::BYTES]
     if template.nil? || template == '_'
       raise ArgumentError, 'bytes only works for sizes of 8, 16, 32, or 64.'
