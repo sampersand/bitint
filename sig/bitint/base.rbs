@@ -1,0 +1,229 @@
+module BitInt
+  class Base < Numeric
+    self.@classes: untyped
+
+    self.@bits: untyped
+
+    self.@signed: untyped
+
+    @int: untyped
+
+    @wrap: untyped
+
+    # Creates a new +BitInt::Base+ subclass.
+    #
+    # Exactly one of +bits+ or +bytes+ must be supplied.
+    #
+    # An +ArgumentError+ is raised if the bit count isn't at least 1.
+    #
+    # === Example
+    #   puts BitInt::Base.create(bits: 8, signed: true).new(128) #=> -127
+    #   puts BitInt::Base.create(bytes: 1, signed: false).new(256) #=> 0
+    def self.create: (signed: untyped, ?bits: untyped?, ?bytes: untyped?) -> untyped
+
+    # :stopdoc:
+    def self.setup!: (untyped bits, untyped signed) -> untyped
+
+    # Returns whether this class represents a signed integer.
+    #
+    # === Example
+    #   puts BitInt::U8.signed? #=> false
+    #   puts BitInt::I8.signed? #=> true
+    def self.signed?: () -> untyped
+
+    # Returns whether this class represents an unsigned integer.
+    #
+    # === Example
+    #   puts BitInt::U8.unsigned? #=> true
+    #   puts BitInt::I8.unsigned? #=> false
+    def self.unsigned?: () -> untyped
+
+    # Returns a debugging string representation of this class
+    #
+    # If the class is one of the builtins (eg +BitInt::U16+), it uses its name
+    # as the string, otherwise it uses a debugging representation
+    #
+    # === Example
+    #    p BitInt::U16   #=> BitInt::U16
+    #    p BitInt::U(17) #=> #<BitInt::Base @bits=17 @signed=false>
+    def self.inspect: () -> untyped
+
+    alias self.to_s self.inspect
+
+    # "Mask"s an integer, making sure it fits within the bounds of this class.
+    def self.mask: (untyped integer) -> untyped
+
+    # Creates a new BitInt by masking +integer+.
+    #
+    # If +integer+ is not rdoc-ref:in_bounds? and +wrap+ is false, then an
+    # +OverflowError+ is raised.
+    #
+    # === Example
+    #   puts BitInt::U8.new(27) #=> 27
+    #   puts BitInt::U8.new(-1) #=> 255
+    #   puts BitInt::U8.new(-1, wrap: false) #=> OverflowError
+    #   puts BitInt::I8.new(255) #=> -1
+    def initialize: (untyped integer, ?wrap: bool) -> void
+
+    # Checks to see if +rhs.to_i+ is equal to this class
+    #
+    # === Example
+    #   U64 = BitInt::U(64)
+    #   twelve = U64.new(12)
+    #
+    #   # Behaves as you'd expect.
+    #   puts twelve == U64.new(12) #=> true
+    #   puts twelve == U64.new(13) #=> false
+    #   puts twelve == 12   #=> true
+    #   puts twelve == 12.0 #=> true
+    #   puts twelve == 13   #=> false
+    #   puts twelve == Object.new #=> false
+    def ==: (untyped rhs) -> untyped
+
+    # Checks to see if +rhs+ is another +BitInt::Base+ of the same class, and
+    # have the same contents.
+    def eql?: (untyped rhs) -> untyped
+
+    # Returns a hash code for this class.
+    def hash: () -> untyped
+
+    # Always return +true+, as +BitInt::Base+s are always integers.
+    def integer?: () -> true
+
+    # Returns the underlying integer.
+    def to_i: () -> untyped
+
+    alias to_int to_i
+
+    # Converts self to a Float.
+    def to_f: () -> untyped
+
+    # Converts self to a String.
+    #
+    # If no base is given, it just returns a normal string in base 10.
+    # If a base is given, a string padded with `0`s will be returned.
+    def to_s: (?untyped? base) -> untyped
+
+    alias inspect to_s
+
+    # Returns a base-16 string of +self+. Equivalent to +to_s(16)+.
+    #
+    # If +upper: true+ is passed, returns an upper-case version.
+    #
+    # === Example
+    #   puts BitInt::U16.new(1234).hex #=> 04d2
+    #   puts BitInt::U16.new(1234, upper: true).hex #=> 04D2
+    def hex: (?upper: bool) -> untyped
+
+    # Returns a base-8 string of +self+. Equivalent to +to_s(8)+.
+    #
+    # === Example
+    #   puts BitInt::U16.new(12345).oct #=> 30071
+    def oct: () -> untyped
+
+    # Returns a base-2 string of +self+. Equivalent to +to_s(2)+.
+    #
+    # === Example
+    #   puts BitInt::U16.new(54321).bin #=> 0000010011010010
+    def bin: () -> untyped
+
+    private
+
+    def new_instance: (untyped int) -> untyped
+
+    public
+
+    # Numerically negates +self+.
+    def -@: () -> untyped
+
+    # Bitwise negates +self+.
+    def ~: () -> untyped
+
+    # Compares +self+ to +rhs+.
+    def <=>: (untyped rhs) -> (untyped | nil)
+
+    # Adds +self+ to +rhs+.
+    def +: (untyped rhs) -> untyped
+
+    # Subtracts +rhs+ from +self+.
+    def -: (untyped rhs) -> untyped
+
+    # Multiplies +self+ by +rhs+.
+    def *: (untyped rhs) -> untyped
+
+    # Divides +self+ by +rhs+.
+    def /: (untyped rhs) -> untyped
+
+    # Modulos +self+ by +rhs+.
+    def %: (untyped rhs) -> untyped
+
+    # Returns whether +self+ is a positive integer. Zero is not positive.
+    def positive?: () -> untyped
+
+    # Return whether +self+ is a negative integer. Zero is not negative.
+    def negative?: () -> untyped
+
+    # Returns whether +self+ is zero.
+    def zero?: () -> untyped
+
+    # Returns a falsey value if zero, otherwise returns +self+.
+    def nonzero?: () -> untyped
+
+    # Checks to see if +self+ is even.
+    def even?: () -> untyped
+
+    # Checks to see if +self+ is odd.
+    def odd?: () -> untyped
+
+    # Raises +self+ to the +rhs+th power.
+    def **: (untyped rhs) -> untyped
+
+    # Shifts +self+ left by +rhs+ bits.
+    def <<: (untyped rhs) -> untyped
+
+    # Shifts +self+ right by +rhs+ bits.
+    def >>: (untyped rhs) -> untyped
+
+    # Bitwise ANDs +self+ and +rhs+.
+    def &: (untyped rhs) -> untyped
+
+    # Bitwise ORs +self+ and +rhs+.
+    def |: (untyped rhs) -> untyped
+
+    # Bitwise XORs +self+ and +rhs+.
+    def ^: (untyped rhs) -> untyped
+
+    # Gets the bit at index +idx+ or returns +nil+.
+    #
+    # This is equivalent to +Integer#[]+
+    def []: (untyped idx) -> untyped
+
+    # Returns true if any bit in `mask` is set in +self+.
+    def anybits?: (untyped mask) -> untyped
+
+    # Returns true if all bits in `mask` are set in +self+.
+    def allbits?: (untyped mask) -> untyped
+
+    # Returns true if no bits in `mask` are set in +self+.
+    def nobits?: (untyped mask) -> untyped
+
+    # Returns the amount of bits required to represent +self+
+    #
+    # Unlike +Integer#bit_length+, this never changes and is equivalent
+    # to +self.class::BITS+.
+    def bit_length: () -> untyped
+
+    # Returns the amount of bytes required to represent +self+
+    #
+    # This is equivalent to +self.class::BYTES+
+    def byte_length: () -> untyped
+
+    def coerce: (untyped other) -> ::Array[self | untyped]
+
+    PACK_FMT: ::Hash[::Array[:native | 8 | false] | ::Array[:native | 16 | false] | ::Array[:native | 32 | false] | ::Array[:native | 64 | false] | ::Array[:native | 8 | true] | ::Array[:native | 16 | true] | ::Array[:native | 32 | true] | ::Array[:native | 64 | true] | ::Array[:little | 8 | false] | ::Array[:little | 16 | false] | ::Array[:little | 32 | false] | ::Array[:little | 64 | false] | ::Array[:little | 8 | true] | ::Array[:little | 16 | true] | ::Array[:little | 32 | true] | ::Array[:little | 64 | true] | ::Array[:big | 8 | false] | ::Array[:big | 16 | false] | ::Array[:big | 32 | false] | ::Array[:big | 64 | false] | ::Array[:big | 8 | true] | ::Array[:big | 16 | true] | ::Array[:big | 32 | true] | ::Array[:big | 64 | true], "C" | "S" | "L" | "Q" | "c" | "s" | "l" | "q" | "C<" | "S<" | "L<" | "Q<" | "c<" | "s<" | "l<" | "q<" | "C>" | "S>" | "L>" | "Q>" | "c>" | "s>" | "l>" | "q>"]
+
+    def bytes: (?::Symbol endian) ?{ (untyped) -> untyped } -> untyped
+
+    def bytes_hex: (*untyped, **untyped) ?{ (?) -> untyped } -> untyped
+  end
+end

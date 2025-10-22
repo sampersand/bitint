@@ -1,0 +1,31 @@
+module BitInt
+  # An unsigned 8-bit integer
+  U8: untyped
+
+  # An unsigned 16-bit integer
+  U16: untyped
+
+  # An unsigned 32-bit integer
+  U32: untyped
+
+  # An unsigned 64-bit integer
+  U64: untyped
+
+  # An unsigned 128-bit integer
+  U128: untyped
+
+  # A signed 8-bit integer
+  I8: untyped
+
+  # A signed 16-bit integer
+  I16: untyped
+
+  # A signed 32-bit integer
+  I32: untyped
+
+  # A signed 64-bit integer
+  I64: untyped
+
+  # A signed 128-bit integer
+  I128: untyped
+end

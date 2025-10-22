@@ -1,0 +1,14 @@
+module BitInt
+  # Indicates that +BitInt::Base.create+ was called with an integer that was too large.
+  class OverflowError < RuntimeError
+    @integer: untyped
+
+    @range: untyped
+
+    attr_reader integer: untyped
+
+    attr_reader range: untyped
+
+    def initialize: (untyped integer, untyped range) -> void
+  end
+end

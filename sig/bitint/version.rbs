@@ -1,3 +1,4 @@
 module BitInt
-  VERSION: String
+  # The current version of BitInt.
+  VERSION: "0.7.0"
 end

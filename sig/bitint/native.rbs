@@ -1,0 +1,70 @@
+module BitInt
+  # +BitInt+s that correspond to underlying C integer sizes.
+  module Native
+    # On big-endian systems, the unpack will equal +0x00AA+.
+    IS_LITTLE_ENDIAN: untyped
+
+    # Returns either +:little+ or +:big+ depending on the underlying system's endianness.
+    def self?.endianness: () -> (:little | :big)
+
+    alias self.endian self.endianness
+
+    # Returns +true+ when on a little endian system.
+    def self?.little_endian?: () -> untyped
+
+    # Returns +true+ when on a big endian system.
+    def self?.big_endian?: () -> untyped
+
+    # A signed +sizeof(char)+-byte BitInt.
+    #
+    # Technically C has a difference between +char+, +unsigned char+, and +signed char+. But there's
+    # no real easy way to tell from within ruby code. So +CHAR+ doesn't exist.
+    #
+    SCHAR: untyped
+
+    # An unsigned +sizeof(char)+-byte BitInt.
+    UCHAR: untyped
+
+    # A signed +sizeof(short)+-byte BitInt.
+    SHORT: untyped
+
+    # An unsigned +sizeof(short)+-byte BitInt.
+    USHORT: untyped
+
+    # A signed +sizeof(int)+-byte BitInt.
+    INT: untyped
+
+    # An unsigned +sizeof(int)+-byte BitInt.
+    UINT: untyped
+
+    # A signed +sizeof(long)+-byte BitInt.
+    LONG: untyped
+
+    # An unsigned +sizeof(long)+-byte BitInt.
+    ULONG: untyped
+
+    # A signed +sizeof(long long)+-byte BitInt. Only enabled if the platform supports +long long+.
+    LONG_LONG: untyped
+
+    # An unsigned +sizeof(long long)+-byte BitInt. Only enabled if the platform supports +long long+.
+    ULONG_LONG: untyped
+
+    # An unsigned +sizeof(void *)+-byte BitInt.
+    VOIDP: untyped
+
+    # An unsigned +sizeof(size_t)+-byte BitInt.
+    SIZE_T: untyped
+
+    # A signed +sizeof(ssize_t)+-byte BitInt.
+    SSIZE_T: untyped
+
+    # A signed +sizeof(ptrdiff_t)+-byte BitInt.
+    PTRDIFF_T: untyped
+
+    # A signed +sizeof(intptr_t)+-byte BitInt.
+    INTPTR_T: untyped
+
+    # An unsigned +sizeof(uintptr_t)+-byte BitInt.
+    UINTPTR_T: untyped
+  end
+end
