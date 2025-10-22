@@ -1,31 +1,31 @@
 module BitInt
   # An unsigned 8-bit integer
-  U8: untyped
+  class U8 < Base end
 
   # An unsigned 16-bit integer
-  U16: untyped
+  class U16 < Base end
 
   # An unsigned 32-bit integer
-  U32: untyped
+  class U32 < Base end
 
   # An unsigned 64-bit integer
-  U64: untyped
+  class U64 < Base end
 
   # An unsigned 128-bit integer
-  U128: untyped
+  class U128 < Base end
 
   # A signed 8-bit integer
-  I8: untyped
+  class I8 < Base end
 
   # A signed 16-bit integer
-  I16: untyped
+  class I16 < Base end
 
   # A signed 32-bit integer
-  I32: untyped
+  class I32 < Base end
 
   # A signed 64-bit integer
-  I64: untyped
+  class I64 < Base end
 
   # A signed 128-bit integer
-  I128: untyped
+  class I128 < Base end
 end

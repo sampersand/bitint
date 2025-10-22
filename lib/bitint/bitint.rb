@@ -27,8 +27,8 @@ module BitInt
   # This is just a helper method that wraps +Base.create+
   #
   # === Example
-  #   puts BitInt[8]::MAX #=> 255
-  #   puts BitInt[8, signed: false]::MAX #=> 255
-  #   puts BitInt[8, signed: true]::MAX #=> 127
+  #   puts BitInt[9]::MAX #=> 511
+  #   puts BitInt[9, signed: false]::MAX #=> 511
+  #   puts BitInt[9, signed: true]::MAX #=> 255
   def [](bits, signed: false) = Base.create(bits: bits, signed: signed)
 end

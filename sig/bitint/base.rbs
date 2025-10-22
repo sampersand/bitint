@@ -22,6 +22,7 @@ module BitInt
     def self.create: (signed: untyped, ?bits: untyped?, ?bytes: untyped?) -> untyped
 
     # :stopdoc:
+
     def self.setup!: (untyped bits, untyped signed) -> untyped
 
     # Returns whether this class represents a signed integer.
@@ -51,7 +52,9 @@ module BitInt
     alias self.to_s self.inspect
 
     # "Mask"s an integer, making sure it fits within the bounds of this class.
-    def self.mask: (untyped integer) -> untyped
+    def self.wrap: (Integer integer) -> Integer
+
+    def self.in_bounds?: (Integer integer) -> bool
 
     # Creates a new BitInt by masking +integer+.
     #
@@ -63,7 +66,7 @@ module BitInt
     #   puts BitInt::U8.new(-1) #=> 255
     #   puts BitInt::U8.new(-1, wrap: false) #=> OverflowError
     #   puts BitInt::I8.new(255) #=> -1
-    def initialize: (untyped integer, ?wrap: bool) -> void
+    def initialize: (Integer integer, ?wrap: bool) -> void
 
     # Checks to see if +rhs.to_i+ is equal to this class
     #
@@ -78,31 +81,31 @@ module BitInt
     #   puts twelve == 12.0 #=> true
     #   puts twelve == 13   #=> false
     #   puts twelve == Object.new #=> false
-    def ==: (untyped rhs) -> untyped
+    def ==: (untyped rhs) -> bool
 
     # Checks to see if +rhs+ is another +BitInt::Base+ of the same class, and
     # have the same contents.
-    def eql?: (untyped rhs) -> untyped
+    def eql?: (untyped rhs) -> bool
 
     # Returns a hash code for this class.
-    def hash: () -> untyped
+    def hash: () -> Integer
 
     # Always return +true+, as +BitInt::Base+s are always integers.
     def integer?: () -> true
 
     # Returns the underlying integer.
-    def to_i: () -> untyped
+    def to_i: () -> Integer
 
     alias to_int to_i
 
     # Converts self to a Float.
-    def to_f: () -> untyped
+    def to_f: () -> Float
 
     # Converts self to a String.
     #
     # If no base is given, it just returns a normal string in base 10.
     # If a base is given, a string padded with `0`s will be returned.
-    def to_s: (?untyped? base) -> untyped
+    def to_s: (?Integer? base) -> String
 
     alias inspect to_s
 
@@ -113,117 +116,127 @@ module BitInt
     # === Example
     #   puts BitInt::U16.new(1234).hex #=> 04d2
     #   puts BitInt::U16.new(1234, upper: true).hex #=> 04D2
-    def hex: (?upper: bool) -> untyped
+    def hex: (?upper: bool) -> String
 
     # Returns a base-8 string of +self+. Equivalent to +to_s(8)+.
     #
     # === Example
     #   puts BitInt::U16.new(12345).oct #=> 30071
-    def oct: () -> untyped
+    def oct: () -> String
 
     # Returns a base-2 string of +self+. Equivalent to +to_s(2)+.
     #
     # === Example
     #   puts BitInt::U16.new(54321).bin #=> 0000010011010010
-    def bin: () -> untyped
+    def bin: () -> String
 
     private
 
-    def new_instance: (untyped int) -> untyped
+    def new_instance: (Integer int) -> instance
 
     public
 
     # Numerically negates +self+.
-    def -@: () -> untyped
+    def -@: () -> instance
 
     # Bitwise negates +self+.
-    def ~: () -> untyped
+    def ~: () -> instance
 
     # Compares +self+ to +rhs+.
-    def <=>: (untyped rhs) -> (untyped | nil)
+    def <=>: (int rhs) -> (-1 | 0 | 1)
+           | (untyped rhs) -> (-1 | 0 | 1)?
 
     # Adds +self+ to +rhs+.
-    def +: (untyped rhs) -> untyped
+    def +: (int rhs) -> instance
 
     # Subtracts +rhs+ from +self+.
-    def -: (untyped rhs) -> untyped
+    def -: (int rhs) -> instance
 
     # Multiplies +self+ by +rhs+.
-    def *: (untyped rhs) -> untyped
+    def *: (int rhs) -> instance
 
     # Divides +self+ by +rhs+.
-    def /: (untyped rhs) -> untyped
+    def /: (int rhs) -> instance
 
     # Modulos +self+ by +rhs+.
-    def %: (untyped rhs) -> untyped
+    def %: (int rhs) -> instance
 
     # Returns whether +self+ is a positive integer. Zero is not positive.
-    def positive?: () -> untyped
+    def positive?: () -> bool
 
     # Return whether +self+ is a negative integer. Zero is not negative.
-    def negative?: () -> untyped
+    def negative?: () -> bool
 
     # Returns whether +self+ is zero.
-    def zero?: () -> untyped
+    def zero?: () -> bool
 
     # Returns a falsey value if zero, otherwise returns +self+.
-    def nonzero?: () -> untyped
+    def nonzero?: () -> self?
 
     # Checks to see if +self+ is even.
-    def even?: () -> untyped
+    def even?: () -> bool
 
     # Checks to see if +self+ is odd.
-    def odd?: () -> untyped
+    def odd?: () -> bool
 
     # Raises +self+ to the +rhs+th power.
-    def **: (untyped rhs) -> untyped
+    def **: (int rhs) -> instance
 
     # Shifts +self+ left by +rhs+ bits.
-    def <<: (untyped rhs) -> untyped
+    def <<: (int rhs) -> instance
 
     # Shifts +self+ right by +rhs+ bits.
-    def >>: (untyped rhs) -> untyped
+    def >>: (int rhs) -> instance
 
     # Bitwise ANDs +self+ and +rhs+.
-    def &: (untyped rhs) -> untyped
+    def &: (int rhs) -> instance
 
     # Bitwise ORs +self+ and +rhs+.
-    def |: (untyped rhs) -> untyped
+    def |: (int rhs) -> instance
 
     # Bitwise XORs +self+ and +rhs+.
-    def ^: (untyped rhs) -> untyped
+    def ^: (int rhs) -> instance
 
     # Gets the bit at index +idx+ or returns +nil+.
     #
     # This is equivalent to +Integer#[]+
-    def []: (untyped idx) -> untyped
+    def []: (__todo__ idx) -> __todo__
 
     # Returns true if any bit in `mask` is set in +self+.
-    def anybits?: (untyped mask) -> untyped
+    def anybits?: (int mask) -> bool
 
     # Returns true if all bits in `mask` are set in +self+.
-    def allbits?: (untyped mask) -> untyped
+    def allbits?: (int mask) -> bool
 
     # Returns true if no bits in `mask` are set in +self+.
-    def nobits?: (untyped mask) -> untyped
+    def nobits?: (int mask) -> bool
 
     # Returns the amount of bits required to represent +self+
     #
     # Unlike +Integer#bit_length+, this never changes and is equivalent
     # to +self.class::BITS+.
-    def bit_length: () -> untyped
+    def bit_length: () -> Integer
 
     # Returns the amount of bytes required to represent +self+
     #
     # This is equivalent to +self.class::BYTES+
-    def byte_length: () -> untyped
+    def byte_length: () -> Integer
 
-    def coerce: (untyped other) -> ::Array[self | untyped]
+    def times: () { (instance) -> void } -> self
+             | () -> Enumerator[instance, self]
+
+    def downto: (int) { (instance) -> void } -> self
+              | (int) -> Enumerator[instance, self]
+    def upto: (int) { (instance) -> void } -> self
+            | (int) -> Enumerator[instance, self]
+
+    def coerce: (__todo__ other) -> [self, instance]
 
     PACK_FMT: ::Hash[::Array[:native | 8 | false] | ::Array[:native | 16 | false] | ::Array[:native | 32 | false] | ::Array[:native | 64 | false] | ::Array[:native | 8 | true] | ::Array[:native | 16 | true] | ::Array[:native | 32 | true] | ::Array[:native | 64 | true] | ::Array[:little | 8 | false] | ::Array[:little | 16 | false] | ::Array[:little | 32 | false] | ::Array[:little | 64 | false] | ::Array[:little | 8 | true] | ::Array[:little | 16 | true] | ::Array[:little | 32 | true] | ::Array[:little | 64 | true] | ::Array[:big | 8 | false] | ::Array[:big | 16 | false] | ::Array[:big | 32 | false] | ::Array[:big | 64 | false] | ::Array[:big | 8 | true] | ::Array[:big | 16 | true] | ::Array[:big | 32 | true] | ::Array[:big | 64 | true], "C" | "S" | "L" | "Q" | "c" | "s" | "l" | "q" | "C<" | "S<" | "L<" | "Q<" | "c<" | "s<" | "l<" | "q<" | "C>" | "S>" | "L>" | "Q>" | "c>" | "s>" | "l>" | "q>"]
 
-    def bytes: (?::Symbol endian) ?{ (untyped) -> untyped } -> untyped
+    def bytes: (?Symbol endian) -> Array[U8]
 
-    def bytes_hex: (*untyped, **untyped) ?{ (?) -> untyped } -> untyped
+    def each_byte: (?Symbol endian) { (U8) -> void } -> self
+                 | (?Symbol endian) -> Enumerator[U8, self]
   end
 end
