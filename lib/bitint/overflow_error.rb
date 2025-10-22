@@ -1,5 +1,5 @@
 module BitInt
-  # Indicates that +BitInt::new+ was called with an integer that was too large.
+  # Indicates that +BitInt::Base.create+ was called with an integer that was too large.
   class OverflowError < RuntimeError
     attr_reader :integer, :range
 
