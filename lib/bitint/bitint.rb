@@ -3,22 +3,28 @@
 module BitInt
   module_function
 
-  # Creates a new unsigned +BitInt+ class.
+  # Creates a new unsigned +BitInt::Base+ class.
+  #
+  # This is just a helper method that wraps +Base.create+
   #
   # === Example
   #   puts BitInt::U(16)::MAX #=> 65535
-  def U(bits) = self[bits, signed: false]
+  def U(bits) = Base.create(bits: bits, signed: false)
   alias unsigned U
 
-  # Creates a new signed +BitInt+ class.
+  # Creates a new signed +BitInt::Base+ class.
+  #
+  # This is just a helper method that wraps +Base.create+
   #
   # === Example
   #   puts BitInt::I(16)::MAX #=> 32767
-  def I(bits) = self[bits, signed: true]
+  def I(bits) = Base.create(bits: bits, signed: true)
   alias signed I
   alias S I
 
-  # Creates a new +BitInt+. Raises an ArgumentError if bits is negative.
+  # Creates a new +BitInt::Base+ class.
+  #
+  # This is just a helper method that wraps +Base.create+
   #
   # === Example
   #   puts BitInt[8]::MAX #=> 255
