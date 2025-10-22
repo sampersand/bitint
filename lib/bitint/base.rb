@@ -336,20 +336,20 @@ module BitInt
       [:native, 32, true].freeze => 'l',
       [:native, 64, true].freeze => 'q',
 
-      [:little, 8,  false].freeze => 'C<',
+      [:little, 8,  false].freeze => 'C',
       [:little, 16, false].freeze => 'S<',
       [:little, 32, false].freeze => 'L<',
       [:little, 64, false].freeze => 'Q<',
-      [:little, 8,  true].freeze => 'c<',
+      [:little, 8,  true].freeze => 'c',
       [:little, 16, true].freeze => 's<',
       [:little, 32, true].freeze => 'l<',
       [:little, 64, true].freeze => 'q<',
 
-      [:big, 8,  false].freeze => 'C>',
+      [:big, 8,  false].freeze => 'C',
       [:big, 16, false].freeze => 'S>',
       [:big, 32, false].freeze => 'L>',
       [:big, 64, false].freeze => 'Q>',
-      [:big, 8,  true].freeze => 'c>',
+      [:big, 8,  true].freeze => 'c',
       [:big, 16, true].freeze => 's>',
       [:big, 32, true].freeze => 'l>',
       [:big, 64, true].freeze => 'q>',
@@ -377,6 +377,15 @@ module BitInt
 
     def each_byte_times(endian = :native, &block)
       return to_enum(_ = __method__, endian) unless block_given?
+
+      if endian == :native
+        endian = BitInt::Native.little_endian? ? :little : :big
+      end
+
+      if endian == :little
+        each_byte_times(:big).to_a.reverse.each(&block)
+        return self
+      end
 
       base = @int
       byte_length.times do
@@ -412,37 +421,27 @@ module BitInt
       self
     end
 
-    def each_byte(endian = :native, &block)
-      return to_enum(_ = __method__, endian) unless block_given?
+    def each_byte(endian = :native)
+      return to_enum(_ = __method__, endian) unless defined? yield
 
-      # base = @int
-      # byte_length.times do
-      #   yield U8.new( base & 0xFF )
-      #   base /= 0xFF
-      # end
+      template = '_CS_L___Q'[self.class::BYTES]
+      if template.nil? || template == '_'
+        raise ArgumentError, 'bytes only works for sizes of 8, 16, 32, or 64.'
+      end
 
-      # template = '_CS_L___Q'[self.class::BYTES]
-      # if template.nil? || template == '_'
-      #   raise ArgumentError, 'bytes only works for sizes of 8, 16, 32, or 64.'
-      # end
+      template.downcase! if self.class.signed?
 
-      # template.downcase! if self.class.signed?
+      case endian
+      when :native then # do nothing
+      when :little then template.concat '<' unless self.class::BYTES == 1
+      when :big    then template.concat '>' unless self.class::BYTES == 1
+      else
+        raise ArgumentError, 'endian must be :big, :little, or :native'
+      end
 
-      # case endian
-      # when :native # do nothing
-      # when :little then template.concat '<'
-      # when :big    then template.concat '>'
-      # else
-      #   raise ArgumentError, 'endian must be :big, :little, or :native'
-      # end
-
-      fmt = PACK_FMT.fetch([ endian, self.class::BITS, self.class.signed? ]) {
-        raise ArgumentError, "bytes only works for sizes of 8, 16, 32, or 64. and for :native, :little, or :big: #{[ endian, self.class::BYTES, self.class.signed? ]}"
-      }
-
-      [@int].pack(fmt)
-        .unpack('C*')
-        .each { |b| yield U8.new(_ = b) }
+      [@int].pack(fmt).unpack('C*').each do |byte|
+        yield U8.new(byte)
+      end
 
       self
     end
@@ -451,12 +450,47 @@ end
 
 require_relative 'bitint'
 require_relative 'constants'
+require_relative 'native'
+require_relative 'overflow_error'
 
-BI = BitInt::U32.new(0xaa_bb_cc_dd)
+[8, 16, 32, 64].each do |bits|
+  [true, false].each do |signed|
+    %i[native little big].each do |endian|
+      bi = BitInt[bits, signed:]
+
+      10000.times do |num|
+        one = bi.new(rand bi::MIN.to_i..bi::MAX.to_i)
+        fmt = one.each_byte_fmt(endian).to_a
+        times = one.each_byte_times(endian).to_a
+        if fmt != times
+          p(
+            bits:,
+            signed:,
+            one:,
+            fmt: fmt.map(&:hex),
+            times: times.map(&:hex)
+          )
+          exit
+        end
+      end
+    end
+  end
+end
+exit
+BI = BitInt::U32.new(0xaa_bb_c)
+
+fmt = BI.each_byte_fmt.to_a
+times = BI.each_byte_times.to_a
+p fmt.map(&:hex), times.map(&:hex)
+fail unless fmt == times
+exit
+
+
 require 'benchmark'
 TESTS = 1_000_000
 Benchmark.bmbm do |results|
   results.report('each_byte_fmt') { TESTS.times { BI.each_byte_fmt.to_a } }
   results.report('each_byte_orig') { TESTS.times { BI.each_byte_orig.to_a } }
   results.report('each_byte_times') { TESTS.times { BI.each_byte_times.to_a } }
+
 end
