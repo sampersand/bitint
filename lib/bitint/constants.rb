@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class BitInt
+module BitInt
   # An unsigned 8-bit integer
   U8 = U(8)
 
