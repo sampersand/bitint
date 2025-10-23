@@ -9,11 +9,24 @@ module BitInt
     @classes = {} #: Hash[[Integer, bool], Class]
     # :startdoc:
 
-
-    # @rbs @wrap: boolish
+    # @rbs self.@classes: Hash[[Integer, bool], Class]
+    # @rbs self.@bits: Integer
+    # @rbs self.@signed: bool
+    # @rbs @wrap: bool
     # @rbs @int: Integer
 
+    # @rbs!
+    #    BITS: Integer
+    #    BYTES: Integer
+    #    MASK: Integer
+    #    ZERO: Base
+    #    ONE: Base
+    #    MIN: Base
+    #    MAX: Base
+    #    BOUNDS: Range[Base]
+
     class << self
+
       # Creates a new {BitInt::Base} subclass.
       #
       # @param bits [Integer?] the amount of bits the subclass should have. Must be at least +1+.
@@ -42,7 +55,8 @@ module BitInt
           raise ArgumentError, 'bit count must be positive', caller(1)
         end
 
-        @classes[[bits, signed].freeze] ||= Class.new(Base) do |cls|
+        key = [bits, signed].freeze #: [Integer, bool]
+        @classes[key] ||= Class.new(Base) do |cls|
           (_ = cls).setup!(bits, signed)
         end
       end
@@ -208,7 +222,7 @@ module BitInt
       return @int.to_s unless base
       base = base.to_int
 
-      adjusted = negative? ? (-2*self.class::MIN + self).to_i : @int
+      adjusted = negative? ? (-2*self.class::MIN.to_i + @int).to_i : @int
       adjusted.to_s(base).rjust(self.class::BITS / Math.log2(base), negative? ? '1' : '0')
     end
     alias inspect to_s
@@ -263,7 +277,7 @@ module BitInt
     #   puts twelve == 13   #=> false
     #   puts twelve == Object.new #=> false
     #
-    # @rbs (untyped) -> bool
+    # @rbs (untyped) -> boolish
     def ==(rhs)
       defined?(rhs.to_i) && @int == rhs.to_i
     end

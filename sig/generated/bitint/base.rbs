@@ -5,7 +5,29 @@ module BitInt
   class Base < Numeric
     @int: Integer
 
-    @wrap: boolish
+    @wrap: bool
+
+    self.@signed: bool
+
+    self.@bits: Integer
+
+    self.@classes: Hash[[ Integer, bool ], Class]
+
+    BITS: Integer
+
+    BYTES: Integer
+
+    MASK: Integer
+
+    ZERO: Base
+
+    ONE: Base
+
+    MIN: Base
+
+    MAX: Base
+
+    BOUNDS: Range[Base]
 
     # Creates a new {BitInt::Base} subclass.
     #
@@ -22,10 +44,10 @@ module BitInt
     #   puts BitInt::Base.create(bits: 8, signed: true).new(128)   #=> -127
     #   puts BitInt::Base.create(bytes: 1, signed: false).new(256) #=> 0
     #
-    # @rbs (bits: Integer, signed: bool) -> _Child
-    #    | (bytes: Integer, signed: bool) -> _Child
-    def self.create: (bits: Integer, signed: bool) -> _Child
-                   | (bytes: Integer, signed: bool) -> _Child
+    # @rbs (bits: Integer, signed: bool) -> untyped
+    #    | (bytes: Integer, signed: bool) -> untyped
+    def self.create: (bits: Integer, signed: bool) -> untyped
+                   | (bytes: Integer, signed: bool) -> untyped
 
     # :stopdoc:
     # @rbs (Integer, bool) -> void
@@ -190,8 +212,8 @@ module BitInt
     #   puts twelve == 13   #=> false
     #   puts twelve == Object.new #=> false
     #
-    # @rbs (untyped) -> bool
-    def ==: (untyped) -> bool
+    # @rbs (untyped) -> boolish
+    def ==: (untyped) -> boolish
 
     # Checks to see if +rhs+ is another +BitInt::Base+ of the same class, and
     # have the same contents.
