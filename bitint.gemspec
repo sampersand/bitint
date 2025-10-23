@@ -9,7 +9,6 @@ Gem::Specification.new do |spec|
   spec.email = ['mail@sampersand.me']
 
   spec.summary = "A 2's-complement integer of arbitrary length"
-  # spec.description = 'todo: Write a longer description or delete this line.'
   spec.homepage = 'https://github.com/sampersand/bitint'
   spec.license = 'MIT'
   spec.required_ruby_version = '>= 3.0.0'
@@ -23,8 +22,4 @@ Gem::Specification.new do |spec|
       (f == __FILE__) || f.match(%r{\A(?:(?:test|spec|features)/|\.(?:git|travis|circleci)|appveyor)})
     end
   end
-
-  # spec.bindir = 'exe'
-  # spec.executables = spec.files.grep(%r{\Aexe/}) { |f| File.basename(f) }
-  # spec.require_paths = ['lib']
 end
