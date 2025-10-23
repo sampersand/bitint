@@ -1,0 +1,72 @@
+# Generated from lib/bitint/refinements.rb with RBS::Inline
+
+module BitInt
+  # Refinements to +Integer+ for easy "+BitInt+ literals" (eg +puts(12.u8)+)
+  module Refinements
+    # Converts +self+ into an unsigned +bits+-bit integer.
+    #
+    # Any additional arguments are forwarded to +BitInt#new+
+    #
+    # === Examples
+    #   puts BitInt::U(16)::MAX #=> 65535
+    #   
+    def u: (untyped bits) -> untyped
+
+    # Converts +self+ into a signed +bits+-bit integer.
+    #
+    # If no arguments are given, this instead forwards to Numeric#i.
+    #
+    # Any additional arguments are forwarded to +BitInt#new+
+    def i: (?untyped bits) -> untyped
+
+    # Converts +self+ into an unsigned 8-bit integer.
+    #
+    # Any additional arguments are forwarded to +BitInt#new+
+    def u8: () -> untyped
+
+    # Converts +self+ into an unsigned 16-bit integer.
+    #
+    # Any additional arguments are forwarded to +BitInt#new+
+    def u16: () -> untyped
+
+    # Converts +self+ into an unsigned 32-bit integer.
+    #
+    # Any additional arguments are forwarded to +BitInt#new+
+    def u32: () -> untyped
+
+    # Converts +self+ into an unsigned 64-bit integer.
+    #
+    # Any additional arguments are forwarded to +BitInt#new+
+    def u64: () -> untyped
+
+    # Converts +self+ into an unsigned 128-bit integer.
+    #
+    # Any additional arguments are forwarded to +BitInt#new+
+    def u128: () -> untyped
+
+    # Converts +self+ into a signed 8-bit integer.
+    #
+    # Any additional arguments are forwarded to +BitInt#new+
+    def i8: () -> untyped
+
+    # Converts +self+ into a signed 16-bit integer.
+    #
+    # Any additional arguments are forwarded to +BitInt#new+
+    def i16: () -> untyped
+
+    # Converts +self+ into a signed 32-bit integer.
+    #
+    # Any additional arguments are forwarded to +BitInt#new+
+    def i32: () -> untyped
+
+    # Converts +self+ into a signed 64-bit integer.
+    #
+    # Any additional arguments are forwarded to +BitInt#new+
+    def i64: () -> untyped
+
+    # Converts +self+ into a signed 128-bit integer.
+    #
+    # Any additional arguments are forwarded to +BitInt#new+
+    def i128: () -> untyped
+  end
+end

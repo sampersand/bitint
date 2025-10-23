@@ -1,3 +1,6 @@
+# frozen_string_literal: true
+# rbs_inline: enabled
+
 module BitInt
   # Indicates that +BitInt::Base.create+ was called with an integer that was too large.
   class OverflowError < RuntimeError

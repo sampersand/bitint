@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rbs_inline: enabled
 
 module BitInt
   # Refinements to +Integer+ for easy "+BitInt+ literals" (eg +puts(12.u8)+)

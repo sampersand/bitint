@@ -1,0 +1,74 @@
+# Generated from lib/bitint/native.rb with RBS::Inline
+
+module BitInt
+  # +BitInt+s that correspond to underlying C integer sizes.
+  module Native
+    # On big-endian systems, the unpack will equal +0x00AA+.
+    IS_LITTLE_ENDIAN: untyped
+
+    # Helper method to fetch the endianness of the underlying system.
+    #
+    # @rbs () -> (:little | :big)
+    def self?.endianness: () -> (:little | :big)
+
+    alias self.endian self.endianness
+
+    # Returns +true+ when on a little endian system.
+    #
+    # @rbs () -> bool
+    def self?.little_endian?: () -> bool
+
+    # Returns +true+ when on a big endian system.
+    #
+    # @rbs () -> bool
+    def self?.big_endian?: () -> bool
+
+    class SCHAR < Base
+    end
+
+    class UCHAR < Base
+    end
+
+    class SHORT < Base
+    end
+
+    class USHORT < Base
+    end
+
+    class INT < Base
+    end
+
+    class UINT < Base
+    end
+
+    class LONG < Base
+    end
+
+    class ULONG < Base
+    end
+
+    class LONG_LONG < Base
+    end
+
+    class ULONG_LONG < Base
+    end
+
+    class VOIDP < Base
+    end
+
+    class SIZE_T < Base
+    end
+
+    class SSIZE_T < Base
+    end
+
+    class PTRDIFF_T < Base
+    end
+
+    class INTPTR_T < Base
+    end
+
+    class UINTPTR_T < Base
+    end
+  end
+end
