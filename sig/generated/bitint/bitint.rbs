@@ -1,9 +1,6 @@
-# frozen_string_literal: true
-# rbs_inline: enabled
+# Generated from lib/bitint/bitint.rb with RBS::Inline
 
 module BitInt
-  module_function
-
   # Helper to create new unsigned {BitInt::Base} classes.
   #
   # This method just wraps {Base.create}
@@ -15,7 +12,8 @@ module BitInt
   #   puts BitInt::U(16)::MAX #=> 65535
   #
   # @rbs (Integer) -> untyped
-  def U(bits) = Base.create(bits: bits, signed: false)
+  def self?.U: (Integer) -> untyped
+
   alias unsigned U
 
   # Helper to create new signed {BitInt::Base} classes.
@@ -29,8 +27,10 @@ module BitInt
   #   puts BitInt::I(16)::MAX #=> 32767
   #
   # @rbs (Integer) -> untyped
-  def I(bits) = Base.create(bits: bits, signed: true)
+  def self?.I: (Integer) -> untyped
+
   alias signed I
+
   alias S I
 
   # Helper to create new {BitInt::Base} classes.
@@ -47,5 +47,5 @@ module BitInt
   #   puts BitInt[9, signed: true]::MAX #=> 255
   #
   # @rbs (Integer, ?signed: bool) -> untyped
-  def [](bits, signed: false) = Base.create(bits: bits, signed: signed)
+  def self?.[]: (Integer, ?signed: bool) -> untyped
 end

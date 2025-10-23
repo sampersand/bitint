@@ -1,0 +1,400 @@
+# Generated from lib/bitint/base.rb with RBS::Inline
+
+module BitInt
+  # @abstract Subclasses must be created via `Base.create`
+  class Base < Numeric
+    @int: Integer
+
+    @wrap: boolish
+
+    # Creates a new {BitInt::Base} subclass.
+    #
+    # @param bits [Integer?] the amount of bits the subclass should have. Must be at least +1+.
+    # @param bytes [Integer?] convenience argument; if supplied, sets +bits+ to +bytes * 8+. Cannot be used with +bits+
+    # @param signed [bool] Whether the subclass is a signed.
+    #
+    # @return [singleton(Base)] A subclass of {BitInt::Base}; subclasses are cached, so repeated calls return the same subclass.
+    #
+    # @raise [ArgumentError] When +bits+ is negative or zero
+    # @raise [ArgumentError] If both +bits+ and +bytes+ are supplied
+    #
+    # === Example
+    #   puts BitInt::Base.create(bits: 8, signed: true).new(128)   #=> -127
+    #   puts BitInt::Base.create(bytes: 1, signed: false).new(256) #=> 0
+    #
+    # @rbs (bits: Integer, signed: bool) -> _Child
+    #    | (bytes: Integer, signed: bool) -> _Child
+    def self.create: (bits: Integer, signed: bool) -> _Child
+                   | (bytes: Integer, signed: bool) -> _Child
+
+    # :stopdoc:
+    # @rbs (Integer, bool) -> void
+    def self.setup!: (Integer, bool) -> void
+
+    # Returns whether this class represents a signed integer.
+    #
+    # @abstract Only defined on subclasses
+    #
+    # === Example
+    #   puts BitInt::U8.signed? #=> false
+    #   puts BitInt::I8.signed? #=> true
+    #
+    # @rbs () -> bool
+    def self.signed?: () -> bool
+
+    # Returns whether this class represents an unsigned integer.
+    #
+    # @abstract Only defined on subclasses
+    #
+    # === Example
+    #   puts BitInt::U8.unsigned? #=> true
+    #   puts BitInt::I8.unsigned? #=> false
+    #
+    # @rbs () -> bool
+    def self.unsigned?: () -> bool
+
+    # Returns a debugging string representation of this class
+    #
+    # If the class is one of the builtins (eg +BitInt::U16+), it uses its name
+    # as the string, otherwise it uses a debugging representation
+    #
+    # === Example
+    #    p BitInt::U16   #=> BitInt::U16
+    #    p BitInt::U(17) #=> #<BitInt::Base @bits=17 @signed=false>
+    #
+    # @rbs () -> String
+    def self.inspect: () -> String
+
+    alias self.to_s self.inspect
+
+    # Wraps an +integer+ to be within the bounds of +self+
+    #
+    # @param integer [Integer] the integer to wrap
+    # @return [Integer] an integer guaranteed to be within +self::BOUNDS+.
+    #
+    # @abstract Only defined on subclasses
+    #
+    # === Example
+    #     puts BitInt::I8.wrap(127) #=> 127
+    #     puts BitInt::I8.wrap(128) #=> -128
+    #     puts BitInt::I8.wrap(0xFF_FF_FF_FF_FF) #=> -1
+    #
+    # @rbs (Integer) -> Integer
+    def self.wrap: (Integer) -> Integer
+
+    # Check to see if +integer+ is in bounds for +self+
+    #
+    # @abstract Only defined on subclasses
+    #
+    # @param integer [Integer] the integer to check
+    # @return [bool] whether the integer is in bounds
+    #
+    # === Example
+    #     puts BitInt::I16.in_bounds?(32767) #=> true
+    #     puts BitInt::I16.in_bounds?(32768) #=> false
+    #     puts BitInt::U32.in_bounds?(-1)     #=> false
+    #
+    # @rbs (Integer) -> bool
+    def self.in_bounds?: (Integer) -> bool
+
+    # Creates a new instance with the +integer+.
+    #
+    # @param integer [Integer] the integer to use
+    # @param wrap [bool] changes how {Base.in_bounds? out-of-bounds} integers are handled. When true,
+    #                    they're {Base.wrap wrapped}; when false, an +OverflowError+ to be raised.
+    # @raise [OverflowError] raised when +wrap+ is +false+ and +integer+ is out of bounds.
+    #
+    # === Example
+    #   puts BitInt::U8.new(27) #=> 27
+    #   puts BitInt::U8.new(-1) #=> 255
+    #   puts BitInt::U8.new(-1, wrap: false) #=> OverflowError
+    #   puts BitInt::I8.new(255) #=> -1
+    #
+    # @rbs (Integer, ?wrap: boolish) -> void
+    def initialize: (Integer, ?wrap: boolish) -> void
+
+    # Returns the underlying integer.
+    #
+    # @rbs () -> Integer
+    def to_i: () -> Integer
+
+    alias to_int to_i
+
+    # Converts +self+ to a +Float+.
+    #
+    # @rbs () -> Float
+    def to_f: () -> Float
+
+    # Converts +self+ to a +Rational+.
+    #
+    # @rbs () -> Rational
+    def to_r: () -> Rational
+
+    # Converts +self+ to a +String+.
+    #
+    # If no +base+ is given, it just returns a normal String in base 10.
+    # If a base is given, a string padded with `0`s will be returned.
+    #
+    # === Examples
+    #    puts BitInt::U16.new(1234).to_s     #=> 1234
+    #    puts BitInt::U16.new(1234).to_s(16) #=> 04d2
+    #
+    # @rbs (?int? base) -> String
+    def to_s: (?int? base) -> String
+
+    alias inspect to_s
+
+    # Returns a base-16 string of +self+. Equivalent to +to_s(16)+.
+    #
+    # If +upper: true+ is passed, returns an upper-case version.
+    #
+    # === Examples
+    #   puts BitInt::U16.new(1234).hex #=> 04d2
+    #   puts BitInt::U16.new(1234, upper: true).hex #=> 04D2
+    #
+    # @rbs (?upper: boolish) -> String
+    def hex: (?upper: boolish) -> String
+
+    # Returns a base-8 string of +self+. Equivalent to +to_s(8)+.
+    #
+    # === Example
+    #   puts BitInt::U16.new(12345).oct #=> 30071
+    #
+    # @rbs () -> String
+    def oct: () -> String
+
+    # Returns a base-2 string of +self+. Equivalent to +to_s(2)+.
+    #
+    # === Example
+    #   puts BitInt::U16.new(54321).bin #=> 0000010011010010
+    #
+    # @rbs () -> String
+    def bin: () -> String
+
+    # Converts +other+ to an instance of +self+, and returns a tuple of +[<converted>, self]+
+    #
+    # @rbs (int) -> [instance, self]
+    def coerce: (int) -> [ instance, self ]
+
+    # Checks to see if +rhs+ is equal to +selF+
+    #
+    # === Example
+    #   U64 = BitInt::U(64)
+    #   twelve = U64.new(12)
+    #
+    #   # Behaves as you'd expect.
+    #   puts twelve == U64.new(12) #=> true
+    #   puts twelve == U64.new(13) #=> false
+    #   puts twelve == 12   #=> true
+    #   puts twelve == 12.0 #=> true
+    #   puts twelve == 13   #=> false
+    #   puts twelve == Object.new #=> false
+    #
+    # @rbs (untyped) -> bool
+    def ==: (untyped) -> bool
+
+    # Checks to see if +rhs+ is another +BitInt::Base+ of the same class, and
+    # have the same contents.
+    #
+    # @rbs (untyped) -> bool
+    def eql?: (untyped) -> bool
+
+    # Returns a hash code for this class.
+    #
+    # @rbs () -> Integer
+    def hash: () -> Integer
+
+    # Always return +true+, as +BitInt::Base+s are always integers.
+    #
+    # @rbs () -> true
+    def integer?: () -> true
+
+    # @rbs (Integer, ?wrap: bool) -> instance
+    private def new_instance: (Integer, ?wrap: bool) -> instance
+
+    # Numerically negates +self+.
+    #
+    # @rbs () -> instance
+    def -@: () -> instance
+
+    # Compares +self+ to +rhs+.
+    #
+    # @rbs (_ToI) -> (-1 | 0 | 1)
+    #    | (untyped) -> Integer?
+    def <=>: (_ToI) -> (-1 | 0 | 1)
+           | (untyped) -> Integer?
+
+    # Adds +self+ to +rhs+.
+    #
+    # @rbs (int) -> instance
+    def +: (int) -> instance
+
+    # Subtracts +rhs+ from +self+.
+    #
+    # @rbs (int) -> instance
+    def -: (int) -> instance
+
+    # Multiplies +self+ by +rhs+.
+    #
+    # @rbs (int) -> instance
+    def *: (int) -> instance
+
+    # Divides +self+ by +rhs+.
+    #
+    # @rbs (int) -> instance
+    def /: (int) -> instance
+
+    # Modulos +self+ by +rhs+.
+    #
+    # @rbs (int) -> instance
+    def %: (int) -> instance
+
+    # Raises +self+ to the +rhs+th power.
+    #
+    # @rbs (int) -> instance
+    def **: (int) -> instance
+
+    # Returns whether +self+ is a positive integer. Zero is not positive.
+    #
+    # @rbs () -> bool
+    def positive?: () -> bool
+
+    # Return whether +self+ is a negative integer. Zero is not negative.
+    #
+    # @rbs () -> bool
+    def negative?: () -> bool
+
+    # Returns whether +self+ is zero.
+    #
+    # @rbs () -> bool
+    def zero?: () -> bool
+
+    # Returns a falsey value if zero, otherwise returns +self+.
+    #
+    # @rbs () -> self?
+    def nonzero?: () -> self?
+
+    # Checks to see if +self+ is even.
+    #
+    # @rbs () -> bool
+    def even?: () -> bool
+
+    # Checks to see if +self+ is odd.
+    #
+    # @rbs () -> bool
+    def odd?: () -> bool
+
+    # Same as +Integer#times+, but returns instances of +self+.
+    #
+    # @rbs () -> Enumerator[instance, self]
+    #    | () { (instance) -> void } -> self
+    def times: () -> Enumerator[instance, self]
+             | () { (instance) -> void } -> self
+
+    # Same as +Integer#downto+, but returns instances of +self+.
+    #
+    # @rbs (Numeric) -> Enumerator[instance, self]
+    #    | (Numeric) { (instance) -> void } -> self
+    def downto: (Numeric) -> Enumerator[instance, self]
+              | (Numeric) { (instance) -> void } -> self
+
+    # Same as +Integer#downto+, but returns instances of +self+.
+    #
+    # @rbs (Numeric) -> Enumerator[instance, self]
+    #    | (Numeric) { (instance) -> void } -> self
+    def upto: (Numeric) -> Enumerator[instance, self]
+            | (Numeric) { (instance) -> void } -> self
+
+    # Gets the next value, or throws a {OverFlowError} if at the top.
+    #
+    # @rbs () -> instance
+    def succ: () -> instance
+
+    # Gets the next value, or throws a {OverFlowError} if at the top.
+    #
+    # @rbs () -> instance
+    def pred: () -> instance
+
+    # Bitwise negates +self+.
+    #
+    # @rbs () -> instance
+    def ~: () -> instance
+
+    # Shifts +self+ left by +rhs+ bits.
+    #
+    # @rbs (int) -> instance
+    def <<: (int) -> instance
+
+    # Shifts +self+ right by +rhs+ bits.
+    #
+    # @rbs (int) -> instance
+    def >>: (int) -> instance
+
+    # Bitwise ANDs +self+ and +rhs+.
+    #
+    # @rbs (int) -> instance
+    def &: (int) -> instance
+
+    # Bitwise ORs +self+ and +rhs+.
+    #
+    # @rbs (int) -> instance
+    def |: (int) -> instance
+
+    # Bitwise XORs +self+ and +rhs+.
+    #
+    # @rbs (int) -> instance
+    def ^: (int) -> instance
+
+    # Gets the bit at index +idx+ or returns +nil+.
+    #
+    # This is equivalent to +Integer#[]+
+    # @rbs (int, ?int) -> Integer?
+    #    | (range[int]) -> Integer?
+    def []: (int, ?int) -> Integer?
+          | (range[int]) -> Integer?
+
+    # Returns true if any bit in `mask` is set in +self+.
+    #
+    # @rbs (int) -> bool
+    def anybits?: (int) -> bool
+
+    # Returns true if all bits in `mask` are set in +self+.
+    #
+    # @rbs (int) -> bool
+    def allbits?: (int) -> bool
+
+    # Returns true if no bits in `mask` are set in +self+.
+    #
+    # @rbs (int) -> bool
+    def nobits?: (int) -> bool
+
+    # Returns the amount of bits required to represent +self+
+    #
+    # Unlike +Integer#bit_length+, this never changes and is equivalent
+    # to +self.class::BITS+.
+    #
+    # @rbs () -> Integer
+    def bit_length: () -> Integer
+
+    # Returns the amount of bytes required to represent +self+
+    #
+    # This is equivalent to +self.class::BYTES+
+    #
+    # @rbs () -> Integer
+    def byte_length: () -> Integer
+
+    # Returns all the bytes that're used represent +self+
+    #
+    # @rbs (?:native | :big | :little) -> Array[U8]
+    def bytes: (?:native | :big | :little) -> Array[U8]
+
+    # Executes the block once for each byte in +self+.
+    #
+    # Bytes are converted to +U8+. If no block is given, returns an +Enumerator+
+    #
+    # @rbs (?:native | :big | :little) { (U8) -> void } -> self
+    #    | (?:native | :big | :little) -> Enumerator[U8, self]
+    def each_byte: (?:native | :big | :little) { (U8) -> void } -> self
+                 | (?:native | :big | :little) -> Enumerator[U8, self]
+  end
+end

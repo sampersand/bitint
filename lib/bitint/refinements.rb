@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# steep:ignore
 
 module BitInt
   # Refinements to +Integer+ for easy "+BitInt+ literals" (eg +puts(12.u8)+)

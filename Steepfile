@@ -7,6 +7,7 @@ target :lib do
   # check "lib/bitint/bitint.rb"
   # check "Gemfile"                   # File name
   # ignore "lib/templates/*.rb"
+  ignore 'lib/bitint/refinements.rb'
 
   # library "pathname", "set"       # Standard libraries
   # library "strong_json"           # Gems

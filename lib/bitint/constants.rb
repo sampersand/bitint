@@ -1,5 +1,21 @@
 # frozen_string_literal: true
+# rbs_inline: enabled
 
+# @rbs!
+#   module BitInt
+#     class U8 < Base end
+#     class U16 < Base end
+#     class U32 < Base end
+#     class U64 < Base end
+#     class U128 < Base end
+#     class I8 < Base end
+#     class I16 < Base end
+#     class I32 < Base end
+#     class I64 < Base end
+#     class I128 < Base end
+#   end
+
+# @rbs skip
 module BitInt
   # An unsigned 8-bit integer
   U8 = U(8)
