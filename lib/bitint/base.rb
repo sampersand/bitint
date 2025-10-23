@@ -1,3 +1,5 @@
+# rbs_inline: enabled
+
 module BitInt
   # @abstract Subclasses must be created via `Base.create`
   class Base < Numeric
@@ -21,6 +23,9 @@ module BitInt
       # @example
       #   puts BitInt::Base.create(bits: 8, signed: true).new(128)   #=> -127
       #   puts BitInt::Base.create(bytes: 1, signed: false).new(256) #=> 0
+      #
+      # @rbs   [C < Base] (bits: Integer, signed: bool) -> singleton(C)
+      #      | [C < Base] (bytes: Integer, signed: bool) -> singleton(C)
       def create(bits: nil, bytes: nil, signed:)
         if bits.nil? == bytes.nil?
           raise ArgumentError, "exactly one of 'bits' or 'bytes' must be supplied", caller(1)
@@ -38,6 +43,7 @@ module BitInt
       end
 
       # :stopdoc:
+      # @rbs (Integer, bool) -> void
       protected def setup!(bits, signed)
         @bits = bits
         @signed = signed
@@ -68,6 +74,8 @@ module BitInt
       # @example
       #   puts BitInt::U8.signed? #=> false
       #   puts BitInt::I8.signed? #=> true
+      #
+      # @rbs () -> bool
       def signed? = @signed
 
       # Returns whether this class represents an unsigned integer.
@@ -154,13 +162,18 @@ module BitInt
     # :section: Conversions
 
     # Returns the underlying integer.
+    # @rbs return: Integer
     def to_i = @int
     alias to_int to_i
 
     # Converts +self+ to a +Float+.
+    #
+    # @rbs () -> Float
     def to_f = @int.to_f
 
     # Converts +self+ to a +Rational+.
+    #
+    # @rbs () -> Rational
     def to_r = @int.to_r
 
     # (no need for `.to_c` as `Numeric` defines it)
