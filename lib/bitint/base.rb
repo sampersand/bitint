@@ -138,14 +138,80 @@ module BitInt
     #   puts BitInt::I8.new(255) #=> -1
     def initialize(integer, wrap: true)
       if !wrap && !self.class.in_bounds?(integer)
-        raise OverflowError.new(integer, self.class::BOUNDS)
+        exc = OverflowError.new(integer, self.class::BOUNDS)
+        exc.set_backtrace caller_locations(1)
+        raise exc
       end
 
       @int = self.class.wrap(integer)
       @wrap = wrap
     end
 
-    # Checks to see if +rhs.to_i+ is equal to this class
+    ################################################################################################
+    #                                         Conversions                                          #
+    ################################################################################################
+
+    # :section: Conversions
+
+    # Returns the underlying integer.
+    def to_i = @int
+    alias to_int to_i
+
+    # Converts +self+ to a +Float+.
+    def to_f = @int.to_f
+
+    # Converts +self+ to a +Rational+.
+    def to_r = @int.to_r
+
+    # (no need for `.to_c` as `Numeric` defines it)
+
+    # Converts +self+ to a +String+.
+    #
+    # If no +base+ is given, it just returns a normal String in base 10.
+    # If a base is given, a string padded with `0`s will be returned.
+    #
+    # === Examples
+    #    puts BitInt::U16.new(1234).to_s     #=> 1234
+    #    puts BitInt::U16.new(1234).to_s(16) #=> 04d2
+    def to_s(base = nil)
+      return @int.to_s if base.nil?
+
+      adjusted = negative? ? (-2*self.class::MIN + self).to_i : @int
+      adjusted.to_s(base).rjust(self.class::BITS / Math.log2(base), negative? ? '1' : '0')
+    end
+    alias inspect to_s
+
+    # Returns a base-16 string of +self+. Equivalent to +to_s(16)+.
+    #
+    # If +upper: true+ is passed, returns an upper-case version.
+    #
+    # === Examples
+    #   puts BitInt::U16.new(1234).hex #=> 04d2
+    #   puts BitInt::U16.new(1234, upper: true).hex #=> 04D2
+    def hex(upper: false) = to_s(16).tap { _1.upcase! if upper }
+
+    # Returns a base-8 string of +self+. Equivalent to +to_s(8)+.
+    #
+    # === Example
+    #   puts BitInt::U16.new(12345).oct #=> 30071
+    def oct = to_s(8)
+
+    # Returns a base-2 string of +self+. Equivalent to +to_s(2)+.
+    #
+    # === Example
+    #   puts BitInt::U16.new(54321).bin #=> 0000010011010010
+    def bin = to_s(2)
+
+    # Converts +other+ to an instance of +self+, and returns a tuple of +[<converted>, self]+
+    def coerce(other) = [new_instance(other.to_int), self]
+
+    ################################################################################################
+    #                                             ...                                              #
+    ################################################################################################
+
+    # Checks to see if +rhs+ is equal to +selF+
+    #
+    #
     #
     # === Example
     #   U64 = BitInt::U(64)
@@ -174,63 +240,14 @@ module BitInt
     # Always return +true+, as +BitInt::Base+s are always integers.
     def integer? = true
 
-    # :section: Conversions
-
-    # Returns the underlying integer.
-    def to_i = @int
-    alias to_int to_i
-
-    # Converts self to a Float.
-    def to_f = @int.to_f
-
-    # Converts self to a String.
-    #
-    # If no base is given, it just returns a normal string in base 10.
-    # If a base is given, a string padded with `0`s will be returned.
-    def to_s(base = nil)
-      return @int.to_s if base.nil?
-
-      adjusted = negative? ? (-2*self.class::MIN + self).to_i : @int
-      adjusted.to_s(base).rjust(self.class::BITS / Math.log2(base), negative? ? '1' : '0')
-    end
-    alias inspect to_s
-
-    # Returns a base-16 string of +self+. Equivalent to +to_s(16)+.
-    #
-    # If +upper: true+ is passed, returns an upper-case version.
-    #
-    # === Example
-    #   puts BitInt::U16.new(1234).hex #=> 04d2
-    #   puts BitInt::U16.new(1234, upper: true).hex #=> 04D2
-    def hex(upper: false)
-      to_s(16).tap { _1.upcase! if upper }
-    end
-
-    # Returns a base-8 string of +self+. Equivalent to +to_s(8)+.
-    #
-    # === Example
-    #   puts BitInt::U16.new(12345).oct #=> 30071
-    def oct
-      to_s(8)
-    end
-
-    # Returns a base-2 string of +self+. Equivalent to +to_s(2)+.
-    #
-    # === Example
-    #   puts BitInt::U16.new(54321).bin #=> 0000010011010010
-    def bin
-      to_s(2)
-    end
-
     private def new_instance(int) = self.class.new(int, wrap: @wrap)
 
-    # :section: Math
+    ################################################################################################
+    #                                             Math                                             #
+    ################################################################################################
 
     # Numerically negates +self+.
     def -@ = new_instance(-@int)
-
-    # Bitwise negates +self+.
-    def ~ = new_instance(~@int)
 
     # Compares +self+ to +rhs+.
     def <=>(rhs) = defined?(rhs.to_i) ? @int <=> (_ = rhs).to_i : nil
@@ -249,6 +266,9 @@ module BitInt
 
     # Modulos +self+ by +rhs+.
     def %(rhs) = new_instance(@int % rhs.to_int)
+
+    # Raises +self+ to the +rhs+th power.
+    def **(rhs) = new_instance((@int ** rhs.to_int).to_int) # TODO: use `Integer#pow(int, int)`
 
     # :section:
 
@@ -270,15 +290,16 @@ module BitInt
     # Checks to see if +self+ is odd.
     def odd? = @int.odd?
 
-    ##################################
-    # :section: Bit-level operations #
-    ##################################
+    def times = block_given? ? @int.times { yield new_instance _1 } : to_enum(_ = __method__)
+    def downto(what) = block_given? ? @int.downto(what) { yield new_instance _1 } : to_enum(_ = __method__, what)
+    def upto(what) = block_given? ? @int.upto(what) { yield new_instance _1 } : to_enum(_ = __method__, what)
 
-    # Raises +self+ to the +rhs+th power.
-    def **(rhs)
-      # TODO: use `Integer#pow(int, int)`
-      new_instance( (@int ** rhs.to_int).to_int ) # Numeric only defines `.to_int`
-    end
+    ################################################################################################
+    #                                       Bitwise Methods                                        #
+    ################################################################################################
+
+    # Bitwise negates +self+.
+    def ~@ = new_instance(~@int)
 
     # Shifts +self+ left by +rhs+ bits.
     def <<(rhs) = new_instance(@int << rhs.to_int)
@@ -320,109 +341,16 @@ module BitInt
     # This is equivalent to +self.class::BYTES+
     def byte_length = self.class::BYTES
 
-    def times = block_given? ? @int.times { yield new_instance _1 } : to_enum(_ = __method__)
-    def downto(what) = block_given? ? @int.downto(what) { yield new_instance _1 } : to_enum(_ = __method__, what)
-    def upto(what) = block_given? ? @int.upto(what) { yield new_instance _1 } : to_enum(_ = __method__, what)
-
-    def coerce(other) = [self, new_instance(other.to_i)]
-
-    PACK_FMT = {
-      [:native, 8,  false].freeze => 'C',
-      [:native, 16, false].freeze => 'S',
-      [:native, 32, false].freeze => 'L',
-      [:native, 64, false].freeze => 'Q',
-      [:native, 8,  true].freeze => 'c',
-      [:native, 16, true].freeze => 's',
-      [:native, 32, true].freeze => 'l',
-      [:native, 64, true].freeze => 'q',
-
-      [:little, 8,  false].freeze => 'C',
-      [:little, 16, false].freeze => 'S<',
-      [:little, 32, false].freeze => 'L<',
-      [:little, 64, false].freeze => 'Q<',
-      [:little, 8,  true].freeze => 'c',
-      [:little, 16, true].freeze => 's<',
-      [:little, 32, true].freeze => 'l<',
-      [:little, 64, true].freeze => 'q<',
-
-      [:big, 8,  false].freeze => 'C',
-      [:big, 16, false].freeze => 'S>',
-      [:big, 32, false].freeze => 'L>',
-      [:big, 64, false].freeze => 'Q>',
-      [:big, 8,  true].freeze => 'c',
-      [:big, 16, true].freeze => 's>',
-      [:big, 32, true].freeze => 'l>',
-      [:big, 64, true].freeze => 'q>',
-    }.freeze
-    private_constant :PACK_FMT
-
+    # Returns all the bytes that're used represent +self+
     def bytes(endian = :native)
       each_byte(endian).to_a
     end
 
-
-    def each_byte_fmt(endian = :native, &block)
-      return to_enum(_ = __method__, endian) unless block_given?
-
-      fmt = PACK_FMT.fetch([ endian, self.class::BITS, self.class.signed? ]) {
-        raise ArgumentError, "bytes only works for sizes of 8, 16, 32, or 64. and for :native, :little, or :big: #{[ endian, self.class::BYTES, self.class.signed? ]}"
-      }
-
-      [@int].pack(fmt)
-        .unpack('C*')
-        .each { |b| yield U8.new(_ = b) }
-
-      self
-    end
-
-    def each_byte_times(endian = :native, &block)
-      return to_enum(_ = __method__, endian) unless block_given?
-
-      if endian == :native
-        endian = BitInt::Native.little_endian? ? :little : :big
-      end
-
-      if endian == :little
-        each_byte_times(:big).to_a.reverse.each(&block)
-        return self
-      end
-
-      base = @int
-      byte_length.times do
-        yield U8.new( base & 0xFF )
-        base >>= 8
-      end
-
-      self
-    end
-
-    def each_byte_orig(endian = :native, &block)
-      return to_enum(_ = __method__, endian) unless block_given?
-
-      template = '_CS_L___Q'[self.class::BYTES]
-      if template.nil? || template == '_'
-        raise ArgumentError, 'bytes only works for sizes of 8, 16, 32, or 64.'
-      end
-
-      template.downcase! if self.class.signed?
-
-      case endian
-      when :native # do nothing
-      when :little then template.concat '<'
-      when :big    then template.concat '>'
-      else
-        raise ArgumentError, 'endian must be :big, :little, or :native'
-      end
-
-      [@int].pack(template)
-        .unpack('C*')
-        .each { |b| yield U8.new(_ = b) }
-
-      self
-    end
-
+    # Executes the block once for each byte in +self+.
+    #
+    # Bytes are converted to +U8+. If no block is given, returns an +Enumerator+
     def each_byte(endian = :native)
-      return to_enum(_ = __method__, endian) unless defined? yield
+      return to_enum(_ = __method__, endian) unless block_given?
 
       template = '_CS_L___Q'[self.class::BYTES]
       if template.nil? || template == '_'
@@ -446,51 +374,4 @@ module BitInt
       self
     end
   end
-end
-
-require_relative 'bitint'
-require_relative 'constants'
-require_relative 'native'
-require_relative 'overflow_error'
-
-[8, 16, 32, 64].each do |bits|
-  [true, false].each do |signed|
-    %i[native little big].each do |endian|
-      bi = BitInt[bits, signed:]
-
-      10000.times do |num|
-        one = bi.new(rand bi::MIN.to_i..bi::MAX.to_i)
-        fmt = one.each_byte_fmt(endian).to_a
-        times = one.each_byte_times(endian).to_a
-        if fmt != times
-          p(
-            bits:,
-            signed:,
-            one:,
-            fmt: fmt.map(&:hex),
-            times: times.map(&:hex)
-          )
-          exit
-        end
-      end
-    end
-  end
-end
-exit
-BI = BitInt::U32.new(0xaa_bb_c)
-
-fmt = BI.each_byte_fmt.to_a
-times = BI.each_byte_times.to_a
-p fmt.map(&:hex), times.map(&:hex)
-fail unless fmt == times
-exit
-
-
-require 'benchmark'
-TESTS = 1_000_000
-Benchmark.bmbm do |results|
-  results.report('each_byte_fmt') { TESTS.times { BI.each_byte_fmt.to_a } }
-  results.report('each_byte_orig') { TESTS.times { BI.each_byte_orig.to_a } }
-  results.report('each_byte_times') { TESTS.times { BI.each_byte_times.to_a } }
-
 end

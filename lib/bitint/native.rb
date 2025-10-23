@@ -11,9 +11,11 @@ module BitInt
 
     module_function
 
-    # Returns either +:little+ or +:big+ depending on the underlying system's endianness.
+    # Helper method to fetch the endianness of the underlying system.
+    #
+    # @return [:little, :big]
     def endianness
-      @IS_LITTLE_ENDIAN ? :little : :big
+      IS_LITTLE_ENDIAN ? :little : :big
     end
 
     class << self

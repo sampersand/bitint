@@ -13,7 +13,7 @@ module BitInt
       #   puts BitInt::U(16)::MAX #=> 65535
       #   
       def u(bits, ...)
-        BitInt.U(bits, ...).new(self)
+        BitInt::U(bits).new(self, ...)
       end
 
       # Converts +self+ into a signed +bits+-bit integer.
@@ -21,10 +21,10 @@ module BitInt
       # If no arguments are given, this instead forwards to Numeric#i.
       #
       # Any additional arguments are forwarded to +BitInt#new+
-      def i(bits = bits_not_given=true, *a, **k, &b) # Support ruby-3.0
-        bits_not_given and return super
+      def i(bits = bits_not_given=true, ...)
+        bits_not_given and return super()
 
-        BitInt.I(bits, *a, **k, &b).new(self)
+        BitInt::I(bits).new(self, ...)
       end
 
       # Converts +self+ into an unsigned 8-bit integer.

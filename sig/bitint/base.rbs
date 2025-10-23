@@ -230,7 +230,7 @@ module BitInt
     def upto: (int) { (instance) -> void } -> self
             | (int) -> Enumerator[instance, self]
 
-    def coerce: (__todo__ other) -> [self, instance]
+    def coerce: (__todo__ other) -> [instance, self]
 
     PACK_FMT: ::Hash[::Array[:native | 8 | false] | ::Array[:native | 16 | false] | ::Array[:native | 32 | false] | ::Array[:native | 64 | false] | ::Array[:native | 8 | true] | ::Array[:native | 16 | true] | ::Array[:native | 32 | true] | ::Array[:native | 64 | true] | ::Array[:little | 8 | false] | ::Array[:little | 16 | false] | ::Array[:little | 32 | false] | ::Array[:little | 64 | false] | ::Array[:little | 8 | true] | ::Array[:little | 16 | true] | ::Array[:little | 32 | true] | ::Array[:little | 64 | true] | ::Array[:big | 8 | false] | ::Array[:big | 16 | false] | ::Array[:big | 32 | false] | ::Array[:big | 64 | false] | ::Array[:big | 8 | true] | ::Array[:big | 16 | true] | ::Array[:big | 32 | true] | ::Array[:big | 64 | true], "C" | "S" | "L" | "Q" | "c" | "s" | "l" | "q" | "C<" | "S<" | "L<" | "Q<" | "c<" | "s<" | "l<" | "q<" | "C>" | "S>" | "L>" | "Q>" | "c>" | "s>" | "l>" | "q>"]
 
